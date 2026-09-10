@@ -1,0 +1,31 @@
+name: DeepISE
+channels:
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/bioconda/
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.11
+  - pip
+  - mmseqs2
+  - blast
+  - hmmer
+  - mafft
+  - biopython
+  - polars
+  - pyarrow
+  - pandas
+  - numpy
+  - scipy
+  - scikit-learn
+  - pydantic
+  - pyyaml
+  - typer
+  - rich
+  - tqdm
+  - pytest
+  - pytest-cov
+  - ruff
+  - pip:
+      - torch
+      - transformers

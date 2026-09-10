@@ -1,0 +1,45 @@
+# data/manifests/deepise_phase0_v1.yaml
+dataset_version: deepise-phase0-v1
+created_at: "2026-09-10"
+description: "Homology-controlled prokaryotic insertion sequence and transposase benchmark dataset"
+
+positive_source:
+  name: ISfinder
+  snapshot: "2026-09-10"
+  upstream_commit: "bedbeb5c16618eca3e16ef74adf865d6b88cafb5"
+  curated_is_records: 6007
+  total_proteins: 8433
+  confirmed_transposases: 7121
+
+negative_source:
+  name: Swiss-Prot
+  release: "2026-09"
+  path: "/hpcfs/fpublic/database/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz"
+  curated_negatives: true
+
+deduplication:
+  protein_exact: true
+  method: "SHA-256 exact sequence collapse"
+
+clustering:
+  method: MMseqs2
+  min_seq_id: 0.30
+  coverage: 0.80
+  cov_mode: 0
+  cluster_mode: 2
+  sensitivity: 7.5
+
+splitting:
+  strategy: cluster_aware
+  ratios:
+    train: 0.70
+    validation: 0.15
+    test: 0.15
+  seed: 42
+
+leakage_audit:
+  tool: MMseqs2
+  threshold_identity: 0.30
+  threshold_coverage: 0.80
+  violations: 0
+  status: "PASSED"

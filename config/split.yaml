@@ -1,0 +1,12 @@
+# config/split.yaml
+strategy: cluster30
+seed: 42
+
+ratios:
+  train: 0.70
+  validation: 0.15
+  test: 0.15
+
+family_holdout:
+  minimum_clusters_per_family: 5
+  minimum_sequences_per_family: 20

@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deepise"
+version = "0.1.0"
+description = "Deep insertion-sequence discovery using protein language models, structural homology and genomic-context evidence"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "DeepISE Team" }
+]
+dependencies = [
+    "torch",
+    "biopython",
+    "polars",
+    "pyarrow",
+    "pandas",
+    "numpy",
+    "scipy",
+    "scikit-learn",
+    "pydantic>=2.0",
+    "pyyaml",
+    "typer>=0.9.0",
+    "rich",
+    "tqdm"
+]
+
+[project.scripts]
+deepise-data = "deepise_ml.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["python"]
+
+[tool.pytest.ini_options]
+pythonpath = ["python"]
+testpaths = ["tests"]

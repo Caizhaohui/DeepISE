@@ -1,0 +1,15 @@
+clusters:
+  test: 51
+  total: 301
+  train: 196
+  validation: 54
+counts:
+  test: 1063
+  total: 7057
+  train: 4928
+  validation: 1066
+protein_identity_constraint:
+  coverage: 0.8
+  threshold: 0.3
+seed: 42
+strategy: cluster30

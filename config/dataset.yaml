@@ -1,0 +1,17 @@
+# config/dataset.yaml
+version: deepise-phase0-v1
+date: 2026-09-10
+
+paths:
+  raw_isfinder: data/raw/isfinder/2026-09-10
+  interim_normalized: data/interim/isfinder_normalized.parquet
+  processed_positives: data/processed/positives.parquet
+  processed_tpases: data/processed/tpases.parquet
+  processed_tpases_fasta: data/processed/tpases.faa
+  processed_is_elements: data/processed/is_elements.parquet
+  processed_is_elements_fasta: data/processed/is_elements.fna
+  processed_negatives: data/processed/negatives.parquet
+  processed_negatives_fasta: data/processed/negatives.faa
+  splits_dir: data/splits
+  manifests_dir: data/manifests
+  reports_dir: benchmark/reports

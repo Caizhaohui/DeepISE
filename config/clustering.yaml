@@ -1,0 +1,15 @@
+# config/clustering.yaml
+tpase:
+  min_seq_id: 0.30
+  coverage: 0.80
+  cov_mode: 0
+  cluster_mode: 2
+  sensitivity: 7.5
+
+sensitivity_analysis:
+  coverages: [0.50, 0.70, 0.80]
+
+full_is:
+  min_seq_id: 0.80
+  coverage: 0.80
+  cov_mode: 0

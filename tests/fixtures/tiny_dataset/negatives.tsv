@@ -1,0 +1,21 @@
+negative_id	negative_type	description	sequence
+neg_001	easy	ribosomal protein L1	MPKIRKVRFGRLDKLAV
+neg_002	easy	ribosomal protein L2	MPKIRKVRFGRLDKLAA
+neg_003	easy	ribosomal protein L3	MPKIRKVRFGRLDKLAE
+neg_004	easy	ribosomal protein S1	MPKIRKVRFGRLDKLAQ
+neg_005	easy	ribosomal protein S2	MPKIRKVRFGRLDKLAN
+neg_006	easy	ATP synthase subunit alpha	MTRPLVAVDDFSRMRR
+neg_007	easy	ATP synthase subunit beta	MTRPLVAVDDFSRMRA
+neg_008	easy	elongation factor Tu	MTRPLVAVDDFSRMRE
+neg_009	matched	metabolic dehydrogenase	MGKTIEQIRRQREELGVSLSTLRK
+neg_010	matched	kinase enzyme	MNLNEIRVLRDILAQDVSQATVSR
+neg_011	matched	synthase enzyme	MVTFETVMEIKILHKQGMSSRAIARE
+neg_012	matched	isomerase	MARHKKRITLSEVTELTGISTSTIS
+neg_013	hard	integrase core catalytic	MRLDKLAVALSSAAIAALVAQPTL
+neg_014	hard	site-specific recombinase	MRLDKLAAALSSAAIAALVAQPTL
+neg_015	hard	resolvase catalytic domain	MRLDKLAEALSSAAIAALVAQPTL
+neg_016	hard	invertase DNA invertase	MRLDKLAQALSSAAIAALVAQPTL
+neg_017	hard	RNase H endonuclease	MRLDKLANALSSAAIAALVAQPTL
+neg_018	hard	DDE-type endonuclease	MDDFSRMRALSSAAIAALVAQPTL
+neg_019	hard	plasmid mobility protein MobA	MDDFSRMAALSSAAIAALVAQPTL
+neg_020	hard	phage integrase Int	MDDFSRMEALSSAAIAALVAQPTL

@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+logs/
+*.log
+
+# Large intermediate databases
+data/interim/mmseqs_tpase/
+data/splits/*/leakage_tmp/
+data/splits/*/*.tsv
+
+# Virtual environments
+.env/
+.venv/

@@ -1,0 +1,36 @@
+# config/negatives.yaml
+source_sprot: /hpcfs/fpublic/database/uniprot/current_release/knowledgebase/complete/uniprot_sprot.dat.gz
+source_sprot_fasta: /hpcfs/fpublic/database/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz
+
+ratio_to_positive: 3.0
+
+class_ratios:
+  easy: 0.20
+  matched: 0.30
+  hard: 0.50
+
+length_tolerance: 0.20
+
+exclude_keywords:
+  - transposase
+  - "transposable element"
+  - "insertion sequence"
+  - "mobile element"
+  - ISfinder
+
+hard_negative_keywords:
+  - integrase
+  - recombinase
+  - resolvase
+  - invertase
+  - nuclease
+  - helicase
+  - "RNase H"
+  - "DNA repair"
+  - plasmid
+  - phage
+  - endonuclease
+
+homology_filter:
+  max_evalue: 1e-5
+  min_coverage: 0.50

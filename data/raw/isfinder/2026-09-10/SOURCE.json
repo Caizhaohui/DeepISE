@@ -1,0 +1,13 @@
+{
+  "source": "ISfinder",
+  "retrieved_at": "2026-09-10",
+  "dataset_role": "positive_reference",
+  "upstream_repository": "https://github.com/thanhleviet/ISfinder-sequences",
+  "upstream_commit": "bedbeb5c16618eca3e16ef74adf865d6b88cafb5",
+  "sha256": {
+    "IS.csv": "1d7d4fa2d33488f2a21a6ca1ad908d4960267582b56addcfa5e098a5414cd5e2",
+    "IS.faa": "7672fecd114c962c2d8640b70324e10b9a2f111c9ad6d40112800fdb65213b12",
+    "IS.fna": "47607f9e398d200f1954b18b9d91d6f5a612331ee137cb10d63897688f9d5507"
+  },
+  "notes": "Official ISfinder compiled insertion sequence dataset containing curated prokaryotic IS elements, CDS translations, and complete metadata."
+}
