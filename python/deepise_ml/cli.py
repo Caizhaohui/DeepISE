@@ -37,6 +37,23 @@ from deepise_ml.dataset.negatives import (
     sample_negatives,
     export_negatives,
 )
+from deepise_ml.dataset.negative_split import build_combined_splits
+from deepise_ml.models.blast import build_blast_database, run_blastp, parse_blast_predictions
+from deepise_ml.models.mmseqs import run_mmseqs_search, parse_mmseqs_predictions
+from deepise_ml.models.hmmer import build_family_hmms, run_hmmsearch, parse_hmmsearch_predictions
+from deepise_ml.benchmark.evaluation import (
+    compute_overall_metrics,
+    compute_identity_stratified_recall,
+    compute_family_recall,
+    bootstrap_cluster_ci,
+)
+from deepise_ml.benchmark.report import (
+    export_overall_metrics_table,
+    export_stratified_metrics_table,
+    export_family_metrics_table,
+    generate_phase1_benchmark_report,
+    generate_go_no_go_report,
+)
 
 app = typer.Typer(help="DeepISE Data Management CLI")
 console = Console()
@@ -324,17 +341,273 @@ def summary(
 
 
 @app.command()
-def run_phase0():
-    """Execute the complete Phase-0 pipeline from raw data to frozen benchmark."""
-    console.print("[bold yellow]=== Executing Complete Phase-0 Pipeline ===[/bold yellow]")
-    normalize()
-    deduplicate()
-    cluster()
-    split()
-    audit()
-    build_negatives()
-    summary()
-    console.print("[bold green]=== Phase-0 Data Closed Loop Complete! ===[/bold green]")
+def prepare_eval(
+    split_dir: Path = typer.Option(Path("data/splits/cluster30"), help="Phase-0 split directory"),
+    negatives_parquet: Path = typer.Option(Path("data/processed/negatives.parquet"), help="Negative proteins Parquet"),
+    output_dir: Path = typer.Option(Path("data/splits/cluster30"), help="Output directory"),
+    seed: int = typer.Option(42, help="Random seed"),
+):
+    """Assemble balanced positive+negative evaluation datasets (1:3 ratio) for validation and test."""
+    console.print("[bold blue]Phase-1 Step 1: Building stratified evaluation datasets...[/bold blue]")
+    build_combined_splits(split_dir, negatives_parquet, output_dir, seed=seed)
+
+    train_faa = split_dir / "train.faa"
+    test_combined = pl.read_parquet(output_dir / "test_combined.parquet")
+    val_combined = pl.read_parquet(output_dir / "validation_combined.parquet")
+
+    # Annotate max_train_identity
+    test_hits = split_dir / "test_eval_vs_train.tsv"
+    run_mmseqs_search(output_dir / "test_combined.faa", train_faa, test_hits, output_dir / "tmp_test_ident", sensitivity=7.5)
+
+    max_id_map = {}
+    with open(test_hits, "r") as f:
+        for line in f:
+            parts = line.strip().split("\t")
+            if len(parts) >= 3:
+                q, t, fid = parts[0], parts[1], float(parts[2])
+                if q not in max_id_map or fid > max_id_map[q]:
+                    max_id_map[q] = fid
+
+    test_annotated = test_combined.with_columns(
+        pl.col("seq_id").map_elements(lambda s: max_id_map.get(s, 0.0), return_dtype=pl.Float64).alias("max_train_identity")
+    )
+    test_annotated.write_parquet(output_dir / "test_combined.parquet")
+
+    val_hits = split_dir / "val_eval_vs_train.tsv"
+    run_mmseqs_search(output_dir / "validation_combined.faa", train_faa, val_hits, output_dir / "tmp_val_ident", sensitivity=7.5)
+    val_id_map = {}
+    with open(val_hits, "r") as f:
+        for line in f:
+            parts = line.strip().split("\t")
+            if len(parts) >= 3:
+                q, t, fid = parts[0], parts[1], float(parts[2])
+                if q not in val_id_map or fid > val_id_map[q]:
+                    val_id_map[q] = fid
+
+    val_annotated = val_combined.with_columns(
+        pl.col("seq_id").map_elements(lambda s: val_id_map.get(s, 0.0), return_dtype=pl.Float64).alias("max_train_identity")
+    )
+    val_annotated.write_parquet(output_dir / "validation_combined.parquet")
+    console.print(f"[green]Evaluation datasets assembled in {output_dir}[/green]")
+
+
+@app.command()
+def bench_blast(
+    split_dir: Path = typer.Option(Path("data/splits/cluster30"), help="Evaluation splits directory"),
+    results_dir: Path = typer.Option(Path("benchmark/results"), help="Results directory"),
+    threads: int = typer.Option(16, help="Threads"),
+):
+    """Run BLASTP baseline on validation and test sets."""
+    console.print("[bold blue]Running BLASTP baseline benchmark...[/bold blue]")
+    train_faa = split_dir / "train.faa"
+    val_faa = split_dir / "validation_combined.faa"
+    test_faa = split_dir / "test_combined.faa"
+
+    db_dir = Path("benchmark/db")
+    db_prefix = build_blast_database(train_faa, db_dir, db_name="blast_tpase")
+
+    val_raw = results_dir / "blast_val_raw.tsv"
+    test_raw = results_dir / "blast_test_raw.tsv"
+    run_blastp(val_faa, db_prefix, val_raw, threads=threads)
+    run_blastp(test_faa, db_prefix, test_raw, threads=threads)
+
+    val_preds = parse_blast_predictions(val_raw, val_faa)
+    test_preds = parse_blast_predictions(test_raw, test_faa)
+
+    results_dir.mkdir(parents=True, exist_ok=True)
+    val_preds.write_parquet(results_dir / "blast_val_preds.parquet")
+    test_preds.write_parquet(results_dir / "blast.parquet")
+    test_preds.write_csv(results_dir / "blast.tsv", separator="\t")
+    console.print(f"[green]BLASTP predictions saved to {results_dir / 'blast.tsv'}[/green]")
+
+
+@app.command()
+def bench_mmseqs(
+    split_dir: Path = typer.Option(Path("data/splits/cluster30"), help="Evaluation splits directory"),
+    results_dir: Path = typer.Option(Path("benchmark/results"), help="Results directory"),
+    threads: int = typer.Option(16, help="Threads"),
+):
+    """Run MMseqs2 baseline on validation and test sets."""
+    console.print("[bold blue]Running MMseqs2 baseline benchmark...[/bold blue]")
+    train_faa = split_dir / "train.faa"
+    val_faa = split_dir / "validation_combined.faa"
+    test_faa = split_dir / "test_combined.faa"
+
+    val_raw = results_dir / "mmseqs_val_raw.tsv"
+    test_raw = results_dir / "mmseqs_test_raw.tsv"
+    tmp_dir = Path("benchmark/tmp_mmseqs")
+
+    run_mmseqs_search(val_faa, train_faa, val_raw, tmp_dir / "val", threads=threads)
+    run_mmseqs_search(test_faa, train_faa, test_raw, tmp_dir / "test", threads=threads)
+
+    val_preds = parse_mmseqs_predictions(val_raw, val_faa)
+    test_preds = parse_mmseqs_predictions(test_raw, test_faa)
+
+    results_dir.mkdir(parents=True, exist_ok=True)
+    val_preds.write_parquet(results_dir / "mmseqs_val_preds.parquet")
+    test_preds.write_parquet(results_dir / "mmseqs.parquet")
+    test_preds.write_csv(results_dir / "mmseqs.tsv", separator="\t")
+    console.print(f"[green]MMseqs2 predictions saved to {results_dir / 'mmseqs.tsv'}[/green]")
+
+
+@app.command()
+def bench_hmmer(
+    split_dir: Path = typer.Option(Path("data/splits/cluster30"), help="Evaluation splits directory"),
+    results_dir: Path = typer.Option(Path("benchmark/results"), help="Results directory"),
+    threads: int = typer.Option(16, help="Threads"),
+):
+    """Run HMMER family profile baseline on validation and test sets."""
+    console.print("[bold blue]Running HMMER family profile baseline benchmark...[/bold blue]")
+    train_parquet = split_dir / "train.parquet"
+    val_faa = split_dir / "validation_combined.faa"
+    test_faa = split_dir / "test_combined.faa"
+
+    hmm_db = Path("benchmark/db/deepise_tpases.hmm")
+    tmp_dir = Path("benchmark/tmp_hmmer")
+    build_family_hmms(train_parquet, hmm_db, tmp_dir, threads=threads)
+
+    val_tbl = results_dir / "hmmer_val_raw.tbl"
+    test_tbl = results_dir / "hmmer_test_raw.tbl"
+
+    run_hmmsearch(val_faa, hmm_db, val_tbl, threads=threads)
+    run_hmmsearch(test_faa, hmm_db, test_tbl, threads=threads)
+
+    val_preds = parse_hmmsearch_predictions(val_tbl, val_faa)
+    test_preds = parse_hmmsearch_predictions(test_tbl, test_faa)
+
+    results_dir.mkdir(parents=True, exist_ok=True)
+    val_preds.write_parquet(results_dir / "hmmer_val_preds.parquet")
+    test_preds.write_parquet(results_dir / "hmmer.parquet")
+    test_preds.write_csv(results_dir / "hmmer.tsv", separator="\t")
+    console.print(f"[green]HMMER predictions saved to {results_dir / 'hmmer.tsv'}[/green]")
+
+
+@app.command()
+def bench_esm2(
+    split_dir: Path = typer.Option(Path("data/splits/cluster30"), help="Evaluation splits directory"),
+    results_dir: Path = typer.Option(Path("benchmark/results"), help="Results directory"),
+    embeddings_dir: Path = typer.Option(Path("data/processed/embeddings"), help="Embeddings directory"),
+    model_name: str = typer.Option("facebook/esm2_t12_35M_UR50D", help="ESM-2 checkpoint"),
+    batch_size: int = typer.Option(16, help="Batch size"),
+):
+    """Extract ESM-2 embeddings and train LR & MLP baseline models."""
+    import numpy as np
+    from deepise_ml.models.esm2 import extract_esm2_embeddings, ESM2LinearClassifier, ESM2MLPClassifier
+
+    console.print(f"[bold blue]Extracting ESM-2 embeddings ({model_name})...[/bold blue]")
+    train_faa = split_dir / "train_combined.faa"
+    val_faa = split_dir / "validation_combined.faa"
+    test_faa = split_dir / "test_combined.faa"
+
+    train_npy, _ = extract_esm2_embeddings(train_faa, embeddings_dir / "esm2_train.npy", embeddings_dir / "esm2_train_index.parquet", model_name=model_name, batch_size=batch_size)
+    val_npy, _ = extract_esm2_embeddings(val_faa, embeddings_dir / "esm2_val.npy", embeddings_dir / "esm2_val_index.parquet", model_name=model_name, batch_size=batch_size)
+    test_npy, _ = extract_esm2_embeddings(test_faa, embeddings_dir / "esm2_test.npy", embeddings_dir / "esm2_test_index.parquet", model_name=model_name, batch_size=batch_size)
+
+    X_train = np.load(train_npy)
+    X_val = np.load(val_npy)
+    X_test = np.load(test_npy)
+
+    y_train = pl.read_parquet(split_dir / "train_combined.parquet")["label"].to_numpy()
+    y_val = pl.read_parquet(split_dir / "validation_combined.parquet")["label"].to_numpy()
+    y_test = pl.read_parquet(split_dir / "test_combined.parquet")["label"].to_numpy()
+
+    val_ids = pl.read_parquet(split_dir / "validation_combined.parquet")["seq_id"].to_list()
+    test_ids = pl.read_parquet(split_dir / "test_combined.parquet")["seq_id"].to_list()
+
+    # 1. ESM2-LR
+    console.print("Training ESM2-LR (Logistic Regression)...")
+    clf_lr = ESM2LinearClassifier(C=1.0)
+    clf_lr.fit(X_train, y_train)
+    val_scores_lr = clf_lr.predict_proba(X_val)
+    test_scores_lr = clf_lr.predict_proba(X_test)
+
+    results_dir.mkdir(parents=True, exist_ok=True)
+    pl.DataFrame({"seq_id": val_ids, "score": val_scores_lr}).write_parquet(results_dir / "esm2_lr_val_preds.parquet")
+    test_lr_df = pl.DataFrame({"seq_id": test_ids, "score": test_scores_lr})
+    test_lr_df.write_parquet(results_dir / "esm2_lr.parquet")
+    test_lr_df.write_csv(results_dir / "esm2_lr.tsv", separator="\t")
+
+    # 2. ESM2-MLP
+    console.print("Training ESM2-MLP (1-hidden-layer MLP)...")
+    clf_mlp = ESM2MLPClassifier(hidden_dim=256, dropout=0.2, epochs=25)
+    clf_mlp.fit(X_train, y_train)
+    val_scores_mlp = clf_mlp.predict_proba(X_val)
+    test_scores_mlp = clf_mlp.predict_proba(X_test)
+
+    pl.DataFrame({"seq_id": val_ids, "score": val_scores_mlp}).write_parquet(results_dir / "esm2_mlp_val_preds.parquet")
+    test_mlp_df = pl.DataFrame({"seq_id": test_ids, "score": test_scores_mlp})
+    test_mlp_df.write_parquet(results_dir / "esm2_mlp.parquet")
+    test_mlp_df.write_csv(results_dir / "esm2_mlp.tsv", separator="\t")
+
+    console.print(f"[green]ESM-2 predictions saved to {results_dir}[/green]")
+
+
+@app.command()
+def eval_phase1(
+    split_dir: Path = typer.Option(Path("data/splits/cluster30"), help="Evaluation splits directory"),
+    results_dir: Path = typer.Option(Path("benchmark/results"), help="Results directory"),
+    tables_dir: Path = typer.Option(Path("benchmark/tables"), help="Tables directory"),
+    reports_dir: Path = typer.Option(Path("benchmark/reports"), help="Reports directory"),
+):
+    """Evaluate all available baselines, tune thresholds on validation, and generate benchmark tables and Go/No-Go report."""
+    console.print("[bold yellow]=== Evaluating Phase-1 Models & Generating Benchmark Reports ===[/bold yellow]")
+    val_df = pl.read_parquet(split_dir / "validation_combined.parquet")
+    test_df = pl.read_parquet(split_dir / "test_combined.parquet")
+
+    val_true = val_df["label"].to_numpy()
+    test_true = test_df["label"].to_numpy()
+
+    models_to_eval = [
+        ("BLASTP", "blast_val_preds.parquet", "blast.parquet"),
+        ("MMseqs2", "mmseqs_val_preds.parquet", "mmseqs.parquet"),
+        ("Whole-pHMM", "hmmer_val_preds.parquet", "hmmer.parquet"),
+        ("ESM2-LR", "esm2_lr_val_preds.parquet", "esm2_lr.parquet"),
+        ("ESM2-MLP", "esm2_mlp_val_preds.parquet", "esm2_mlp.parquet"),
+    ]
+
+    metrics_by_model = {}
+    stratified_by_model = {}
+    family_by_model = {}
+
+    for model_name, val_file, test_file in models_to_eval:
+        val_path = results_dir / val_file
+        test_path = results_dir / test_file
+        if not val_path.exists() or not test_path.exists():
+            continue
+
+        val_preds = pl.read_parquet(val_path)
+        test_preds = pl.read_parquet(test_path)
+
+        val_joined = val_df.join(val_preds.select(["seq_id", "score"]), on="seq_id", how="left")
+        test_joined = test_df.join(test_preds.select(["seq_id", "score"]), on="seq_id", how="left")
+
+        val_scores = val_joined["score"].fill_null(0.0).to_numpy()
+        test_scores = test_joined["score"].fill_null(0.0).to_numpy()
+
+        m = compute_overall_metrics(val_true, val_scores, test_true, test_scores)
+        th_5 = m["threshold_5pct_fdr"]
+
+        strat_df = compute_identity_stratified_recall(test_df, test_preds, th_5)
+        fam_df, macro_rec = compute_family_recall(test_df, test_preds, th_5)
+        m["macro_recall"] = macro_rec
+
+        metrics_by_model[model_name] = m
+        stratified_by_model[model_name] = strat_df
+        family_by_model[model_name] = fam_df
+        console.print(f"[{model_name}] AUPRC: {m['auprc']:.4f} | Recall@5%FDR: {m['test_recall_at_5pct_fdr']:.4f} | Macro: {macro_rec:.4f}")
+
+    # Export tables
+    tables_dir.mkdir(parents=True, exist_ok=True)
+    reports_dir.mkdir(parents=True, exist_ok=True)
+
+    overall_df = export_overall_metrics_table(metrics_by_model, tables_dir / "overall_metrics.tsv")
+    strat_df_all = export_stratified_metrics_table(stratified_by_model, tables_dir / "identity_stratified_metrics.tsv")
+    fam_df_all = export_family_metrics_table(family_by_model, tables_dir / "family_metrics.tsv")
+
+    generate_phase1_benchmark_report(overall_df, strat_df_all, reports_dir / "phase1_benchmark.md")
+    generate_go_no_go_report(overall_df, strat_df_all, reports_dir / "go_no_go.md")
+
+    console.print(f"[bold green]Phase-1 Benchmark Reports generated in {reports_dir}[/bold green]")
 
 
 if __name__ == "__main__":

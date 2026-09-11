@@ -12,10 +12,16 @@ htmlcov/
 logs/
 *.log
 
-# Large intermediate databases
-data/interim/mmseqs_tpase/
-data/splits/*/leakage_tmp/
+# Intermediate databases and embeddings
+data/interim/
+data/splits/*/tmp_*
 data/splits/*/*.tsv
+data/splits/*/*.faa
+data/splits/*/leakage_tmp/
+data/processed/embeddings/
+benchmark/tmp_*/
+benchmark/db/
+benchmark/results/*_raw.*
 
 # Virtual environments
 .env/

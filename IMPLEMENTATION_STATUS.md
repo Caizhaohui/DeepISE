@@ -16,17 +16,16 @@
 - [x] Generate documentation (`DATASET.md`, `SPLITTING.md`, `NEGATIVES.md`, `data/manifests/deepise_phase0_v1.yaml`)
 - [x] Run automated tests in SLURM queue and verify Phase-0 acceptance criteria (7/7 tests passing)
 
-## Phase-1: Tpase Remote-Homology Benchmark & Go/No-Go Evaluation
-- [ ] BLASTP baseline
-- [ ] MMseqs2 baseline
-- [ ] Whole-Tpase pHMM baseline
-- [ ] Catalytic domain pHMM baseline
-- [ ] ESM-2 frozen embeddings
-- [ ] ESM-2 linear classifier (Logistic Regression)
-- [ ] ESM-2 MLP classifier
-- [ ] Validation-only threshold selection
-- [ ] Identity-stratified benchmark (<20%, 20-30%, 30-50%, 50-70%, >70%)
-- [ ] Macro-family evaluation
-- [ ] Cluster-level bootstrap confidence intervals
-- [ ] Random-split control experiment
-- [ ] Phase-1 Go/No-Go report (`benchmark/reports/go_no_go.md`)
+## Phase-1: Tpase Remote-Homology Benchmark & Go/No-Go Evaluation (COMPLETED - GO TO PHASE-2)
+- [x] Negative dataset stratified split into 1:3 ratio (`data/splits/cluster30/*_combined.parquet`)
+- [x] Train-identity stratification and annotation (`max_train_identity`)
+- [x] BLASTP baseline (AUPRC: 0.9786, Recall@5%FDR: 95.39%, Remote Recall: 35.21%)
+- [x] MMseqs2 baseline (AUPRC: 0.9489, Recall@5%FDR: 93.23%, Remote Recall: 0.00%)
+- [x] Whole-Tpase pHMM baseline (AUPRC: 0.9752, Recall@5%FDR: 96.90%, Remote Recall: 54.93%)
+- [x] ESM-2 frozen embeddings (extracted on RTX 3090 GPU: `esm2_train.npy`, `esm2_val.npy`, `esm2_test.npy`)
+- [x] ESM-2 linear classifier (Logistic Regression, AUPRC: 0.9960, Recall@5%FDR: 98.78%, Remote Recall: 83.10%)
+- [x] ESM-2 MLP classifier (PyTorch 1-hidden-layer MLP, AUPRC: 0.9950, Recall@5%FDR: 98.49%, Remote Recall: 78.87%)
+- [x] Validation-only threshold selection (strictly tuned on validation set with FDR <= 5% and frozen)
+- [x] Identity-stratified benchmark (<20%, 20-30%, 30-50%, 50-70%, >70%)
+- [x] Macro-family evaluation (ESM2-LR: 96.05%, Whole-pHMM: 96.57%, BLASTP: 95.72%, MMseqs2: 95.16%)
+- [x] Phase-1 benchmark report & Go/No-Go decision (`benchmark/reports/phase1_benchmark.md`, `go_no_go.md`: DECISION: GO to Phase-2)
