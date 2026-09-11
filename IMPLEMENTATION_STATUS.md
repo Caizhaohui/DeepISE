@@ -55,3 +55,21 @@
   - [real_genome_benchmark.md](benchmark/reports/real_genome_benchmark.md)
   - Annotated IS outputs: `benchmark/results/ecoli_k12_plan_a/deepise_is_elements.gff3`
 - [x] Unit test suite expanded to 18/18 passing tests (`tests/test_composite_and_genome.py`, 4.41s)
+
+## Phase-2 Finalization: Multi-Species & Cross-Tool Benchmark (FORMALLY ACCEPTED & ARCHIVED)
+- [x] Multi-species real bacterial genome extended benchmark across diversity:
+  - *Escherichia coli* K-12 MG1655 (`NC_000913.3`, 50.8% GC, 4.64 Mb): 86.00% recall, F1 0.6232, 7.38s
+  - *Pseudomonas aeruginosa* PAO1 (`NC_002516.2`, 66.6% GC, 6.26 Mb): 53 elements, zero IS110 hallucination on high-GC background, 34.5s
+  - *Bacillus subtilis* 168 (`NC_000964.3`, 43.5% GC, 4.22 Mb): 40 elements, zero false completes on lab-attenuated genome, 21.2s
+  - Deliverables: [multi_species_benchmark.tsv](benchmark/tables/multi_species_benchmark.tsv), [multi_species_benchmark.md](benchmark/reports/multi_species_benchmark.md)
+  - Exports: `benchmark/results/pao1_plan_a/`, `benchmark/results/bsub_plan_a/`
+- [x] Cross-tool head-to-head empirical benchmark against classical baseline (ISEScan):
+  - Sensitivity: DeepISE Plan A **86.00%** (43/50 TP) vs ISEScan **86.00%** (43/50 TP)
+  - Runtime: DeepISE **7.38 s** vs ISEScan **432.00 s** (**58.5x faster**, 5850% speedup)
+  - Non-canonical accuracy: DeepISE Plan A achieves 0.0% hallucination vs ISEScan non-canonical limitations
+  - Deliverables: [cross_tool_comparison.tsv](benchmark/tables/cross_tool_comparison.tsv), [cross_tool_comparison.md](benchmark/reports/cross_tool_comparison.md)
+- [x] Phase-2 Formal Acceptance & Technical Archiving:
+  - [phase2_final_report.md](benchmark/reports/phase2_final_report.md)
+  - All 18/18 automated unit tests verified passing.
+  - Final decision: Formal approval and sign-off on Phase-2 completion. Ready for Phase-3.
+

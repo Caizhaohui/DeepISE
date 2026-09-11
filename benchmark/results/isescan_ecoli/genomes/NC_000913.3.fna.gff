@@ -1,0 +1,180 @@
+##gff-version 3
+NC_000913.3	ISEScan	insertion_sequence	15377	16741	.	+	.	ID=NC_000913.3_IS_1;family=IS4;cluster=IS4_169
+NC_000913.3	ISEScan	terminal_inverted_repeat	15377	15412	.	+	.	ID=NC_000913.3_IS_1_TIR;parent=NC_000913.3_IS_1
+NC_000913.3	ISEScan	terminal_inverted_repeat	16706	16741	.	+	.	ID=NC_000913.3_IS_1_TIR;parent=NC_000913.3_IS_1
+NC_000913.3	ISEScan	insertion_sequence	19796	20563	.		.	ID=NC_000913.3_IS_2;family=IS1;cluster=IS1_316
+NC_000913.3	ISEScan	terminal_inverted_repeat	19796	19818	.		.	ID=NC_000913.3_IS_2_TIR;parent=NC_000913.3_IS_2
+NC_000913.3	ISEScan	terminal_inverted_repeat	20541	20563	.		.	ID=NC_000913.3_IS_2_TIR;parent=NC_000913.3_IS_2
+NC_000913.3	ISEScan	insertion_sequence	146686	147773	.	+	.	ID=NC_000913.3_IS_3;family=ISNCY;cluster=ISNCY_229
+NC_000913.3	ISEScan	terminal_inverted_repeat	146686	146715	.	+	.	ID=NC_000913.3_IS_3_TIR;parent=NC_000913.3_IS_3
+NC_000913.3	ISEScan	terminal_inverted_repeat	147742	147773	.	+	.	ID=NC_000913.3_IS_3_TIR;parent=NC_000913.3_IS_3
+NC_000913.3	ISEScan	insertion_sequence	239095	239378	.	+	.	ID=NC_000913.3_IS_4;family=ISAS1;cluster=ISAS1_192
+NC_000913.3	ISEScan	insertion_sequence	257908	258675	.		.	ID=NC_000913.3_IS_5;family=IS1;cluster=IS1_316
+NC_000913.3	ISEScan	terminal_inverted_repeat	257908	257930	.		.	ID=NC_000913.3_IS_5_TIR;parent=NC_000913.3_IS_5
+NC_000913.3	ISEScan	terminal_inverted_repeat	258653	258675	.		.	ID=NC_000913.3_IS_5_TIR;parent=NC_000913.3_IS_5
+NC_000913.3	ISEScan	insertion_sequence	270541	271761	.		.	ID=NC_000913.3_IS_6;family=IS30;cluster=IS30_173
+NC_000913.3	ISEScan	terminal_inverted_repeat	270541	270566	.		.	ID=NC_000913.3_IS_6_TIR;parent=NC_000913.3_IS_6
+NC_000913.3	ISEScan	terminal_inverted_repeat	271736	271761	.		.	ID=NC_000913.3_IS_6_TIR;parent=NC_000913.3_IS_6
+NC_000913.3	ISEScan	insertion_sequence	273955	275149	.		.	ID=NC_000913.3_IS_7;family=IS5;cluster=IS5_112
+NC_000913.3	ISEScan	terminal_inverted_repeat	273955	273970	.		.	ID=NC_000913.3_IS_7_TIR;parent=NC_000913.3_IS_7
+NC_000913.3	ISEScan	terminal_inverted_repeat	275134	275149	.		.	ID=NC_000913.3_IS_7_TIR;parent=NC_000913.3_IS_7
+NC_000913.3	ISEScan	insertion_sequence	279163	279930	.		.	ID=NC_000913.3_IS_8;family=IS1;cluster=IS1_316
+NC_000913.3	ISEScan	terminal_inverted_repeat	279163	279185	.		.	ID=NC_000913.3_IS_8_TIR;parent=NC_000913.3_IS_8
+NC_000913.3	ISEScan	terminal_inverted_repeat	279908	279930	.		.	ID=NC_000913.3_IS_8_TIR;parent=NC_000913.3_IS_8
+NC_000913.3	ISEScan	insertion_sequence	280808	282051	.	-	.	ID=NC_000913.3_IS_9;family=IS481;cluster=IS481_178|IS481||protein:plasmid:28190
+NC_000913.3	ISEScan	terminal_inverted_repeat	280808	280830	.	-	.	ID=NC_000913.3_IS_9_TIR;parent=NC_000913.3_IS_9
+NC_000913.3	ISEScan	terminal_inverted_repeat	282029	282051	.	-	.	ID=NC_000913.3_IS_9_TIR;parent=NC_000913.3_IS_9
+NC_000913.3	ISEScan	insertion_sequence	290634	291401	.		.	ID=NC_000913.3_IS_10;family=IS1;cluster=IS1_316
+NC_000913.3	ISEScan	terminal_inverted_repeat	290634	290656	.		.	ID=NC_000913.3_IS_10_TIR;parent=NC_000913.3_IS_10
+NC_000913.3	ISEScan	terminal_inverted_repeat	291379	291401	.		.	ID=NC_000913.3_IS_10_TIR;parent=NC_000913.3_IS_10
+NC_000913.3	ISEScan	insertion_sequence	315229	316480	.	+	.	ID=NC_000913.3_IS_11;family=IS3;cluster=IS3_168
+NC_000913.3	ISEScan	terminal_inverted_repeat	315229	315264	.	+	.	ID=NC_000913.3_IS_11_TIR;parent=NC_000913.3_IS_11
+NC_000913.3	ISEScan	terminal_inverted_repeat	316445	316480	.	+	.	ID=NC_000913.3_IS_11_TIR;parent=NC_000913.3_IS_11
+NC_000913.3	ISEScan	insertion_sequence	381269	382582	.	+	.	ID=NC_000913.3_IS_12;family=IS3;cluster=IS3_255
+NC_000913.3	ISEScan	terminal_inverted_repeat	381269	381301	.	+	.	ID=NC_000913.3_IS_12_TIR;parent=NC_000913.3_IS_12
+NC_000913.3	ISEScan	terminal_inverted_repeat	382550	382582	.	+	.	ID=NC_000913.3_IS_12_TIR;parent=NC_000913.3_IS_12
+NC_000913.3	ISEScan	insertion_sequence	391709	392966	.	-	.	ID=NC_000913.3_IS_13;family=IS3;cluster=IS3_168
+NC_000913.3	ISEScan	terminal_inverted_repeat	391709	391747	.	-	.	ID=NC_000913.3_IS_13_TIR;parent=NC_000913.3_IS_13
+NC_000913.3	ISEScan	terminal_inverted_repeat	392928	392966	.	-	.	ID=NC_000913.3_IS_13_TIR;parent=NC_000913.3_IS_13
+NC_000913.3	ISEScan	insertion_sequence	528982	530045	.	-	.	ID=NC_000913.3_IS_14;family=IS481;cluster=IS481_213
+NC_000913.3	ISEScan	terminal_inverted_repeat	528982	528999	.	-	.	ID=NC_000913.3_IS_14_TIR;parent=NC_000913.3_IS_14
+NC_000913.3	ISEScan	terminal_inverted_repeat	530028	530045	.	-	.	ID=NC_000913.3_IS_14_TIR;parent=NC_000913.3_IS_14
+NC_000913.3	ISEScan	insertion_sequence	566777	568034	.	+	.	ID=NC_000913.3_IS_15;family=IS3;cluster=IS3_168
+NC_000913.3	ISEScan	terminal_inverted_repeat	566777	566815	.	+	.	ID=NC_000913.3_IS_15_TIR;parent=NC_000913.3_IS_15
+NC_000913.3	ISEScan	terminal_inverted_repeat	567996	568034	.	+	.	ID=NC_000913.3_IS_15_TIR;parent=NC_000913.3_IS_15
+NC_000913.3	ISEScan	insertion_sequence	574588	575788	.		.	ID=NC_000913.3_IS_16;family=IS5;cluster=IS5_112
+NC_000913.3	ISEScan	terminal_inverted_repeat	574588	574606	.		.	ID=NC_000913.3_IS_16_TIR;parent=NC_000913.3_IS_16
+NC_000913.3	ISEScan	terminal_inverted_repeat	575770	575788	.		.	ID=NC_000913.3_IS_16_TIR;parent=NC_000913.3_IS_16
+NC_000913.3	ISEScan	insertion_sequence	607997	609361	.	+	.	ID=NC_000913.3_IS_17;family=IS4;cluster=IS4_169
+NC_000913.3	ISEScan	terminal_inverted_repeat	607997	608032	.	+	.	ID=NC_000913.3_IS_17_TIR;parent=NC_000913.3_IS_17
+NC_000913.3	ISEScan	terminal_inverted_repeat	609326	609361	.	+	.	ID=NC_000913.3_IS_17_TIR;parent=NC_000913.3_IS_17
+NC_000913.3	ISEScan	insertion_sequence	687848	689048	.		.	ID=NC_000913.3_IS_18;family=IS5;cluster=IS5_112
+NC_000913.3	ISEScan	terminal_inverted_repeat	687848	687866	.		.	ID=NC_000913.3_IS_18_TIR;parent=NC_000913.3_IS_18
+NC_000913.3	ISEScan	terminal_inverted_repeat	689030	689048	.		.	ID=NC_000913.3_IS_18_TIR;parent=NC_000913.3_IS_18
+NC_000913.3	ISEScan	insertion_sequence	736445	736699	.	+	.	ID=NC_000913.3_IS_19;family=ISAS1;cluster=ISAS1_192
+NC_000913.3	ISEScan	insertion_sequence	736682	737971	.		.	ID=NC_000913.3_IS_20;family=ISAS1;cluster=ISAS1_192
+NC_000913.3	ISEScan	terminal_inverted_repeat	736682	736699	.		.	ID=NC_000913.3_IS_20_TIR;parent=NC_000913.3_IS_20
+NC_000913.3	ISEScan	terminal_inverted_repeat	737954	737971	.		.	ID=NC_000913.3_IS_20_TIR;parent=NC_000913.3_IS_20
+NC_000913.3	ISEScan	insertion_sequence	738190	738951	.	+	.	ID=NC_000913.3_IS_21;family=ISAS1;cluster=ISAS1_192
+NC_000913.3	ISEScan	terminal_inverted_repeat	738190	738219	.	+	.	ID=NC_000913.3_IS_21_TIR;parent=NC_000913.3_IS_21
+NC_000913.3	ISEScan	terminal_inverted_repeat	738922	738951	.	+	.	ID=NC_000913.3_IS_21_TIR;parent=NC_000913.3_IS_21
+NC_000913.3	ISEScan	insertion_sequence	1049778	1050545	.		.	ID=NC_000913.3_IS_22;family=IS1;cluster=IS1_316
+NC_000913.3	ISEScan	terminal_inverted_repeat	1049778	1049800	.		.	ID=NC_000913.3_IS_22_TIR;parent=NC_000913.3_IS_22
+NC_000913.3	ISEScan	terminal_inverted_repeat	1050523	1050545	.		.	ID=NC_000913.3_IS_22_TIR;parent=NC_000913.3_IS_22
+NC_000913.3	ISEScan	insertion_sequence	1094245	1095502	.	-	.	ID=NC_000913.3_IS_23;family=IS3;cluster=IS3_168
+NC_000913.3	ISEScan	terminal_inverted_repeat	1094245	1094283	.	-	.	ID=NC_000913.3_IS_23_TIR;parent=NC_000913.3_IS_23
+NC_000913.3	ISEScan	terminal_inverted_repeat	1095464	1095502	.	-	.	ID=NC_000913.3_IS_23_TIR;parent=NC_000913.3_IS_23
+NC_000913.3	ISEScan	insertion_sequence	1294394	1295428	.	-	.	ID=NC_000913.3_IS_24;family=IS4;cluster=IS4_463|IS4||protein:plasmid:123269
+NC_000913.3	ISEScan	terminal_inverted_repeat	1294394	1294434	.	-	.	ID=NC_000913.3_IS_24_TIR;parent=NC_000913.3_IS_24
+NC_000913.3	ISEScan	terminal_inverted_repeat	1295388	1295428	.	-	.	ID=NC_000913.3_IS_24_TIR;parent=NC_000913.3_IS_24
+NC_000913.3	ISEScan	insertion_sequence	1299496	1300696	.		.	ID=NC_000913.3_IS_25;family=IS5;cluster=IS5_112
+NC_000913.3	ISEScan	terminal_inverted_repeat	1299496	1299514	.		.	ID=NC_000913.3_IS_25_TIR;parent=NC_000913.3_IS_25
+NC_000913.3	ISEScan	terminal_inverted_repeat	1300678	1300696	.		.	ID=NC_000913.3_IS_25_TIR;parent=NC_000913.3_IS_25
+NC_000913.3	ISEScan	insertion_sequence	1396041	1397241	.		.	ID=NC_000913.3_IS_26;family=IS5;cluster=IS5_112
+NC_000913.3	ISEScan	terminal_inverted_repeat	1396041	1396059	.		.	ID=NC_000913.3_IS_26_TIR;parent=NC_000913.3_IS_26
+NC_000913.3	ISEScan	terminal_inverted_repeat	1397223	1397241	.		.	ID=NC_000913.3_IS_26_TIR;parent=NC_000913.3_IS_26
+NC_000913.3	ISEScan	insertion_sequence	1421556	1422976	.	+	.	ID=NC_000913.3_IS_27;family=IS21;cluster=IS21_259
+NC_000913.3	ISEScan	terminal_inverted_repeat	1421556	1421571	.	+	.	ID=NC_000913.3_IS_27_TIR;parent=NC_000913.3_IS_27
+NC_000913.3	ISEScan	terminal_inverted_repeat	1422961	1422976	.	+	.	ID=NC_000913.3_IS_27_TIR;parent=NC_000913.3_IS_27
+NC_000913.3	ISEScan	insertion_sequence	1427599	1428794	.		.	ID=NC_000913.3_IS_28;family=IS5;cluster=IS5_112
+NC_000913.3	ISEScan	terminal_inverted_repeat	1427599	1427614	.		.	ID=NC_000913.3_IS_28_TIR;parent=NC_000913.3_IS_28
+NC_000913.3	ISEScan	terminal_inverted_repeat	1428779	1428794	.		.	ID=NC_000913.3_IS_28_TIR;parent=NC_000913.3_IS_28
+NC_000913.3	ISEScan	insertion_sequence	1467918	1469231	.		.	ID=NC_000913.3_IS_29;family=IS3;cluster=IS3_255
+NC_000913.3	ISEScan	terminal_inverted_repeat	1467918	1467950	.		.	ID=NC_000913.3_IS_29_TIR;parent=NC_000913.3_IS_29
+NC_000913.3	ISEScan	terminal_inverted_repeat	1469199	1469231	.		.	ID=NC_000913.3_IS_29_TIR;parent=NC_000913.3_IS_29
+NC_000913.3	ISEScan	insertion_sequence	1469296	1470516	.		.	ID=NC_000913.3_IS_30;family=IS30;cluster=IS30_173
+NC_000913.3	ISEScan	terminal_inverted_repeat	1469296	1469321	.		.	ID=NC_000913.3_IS_30_TIR;parent=NC_000913.3_IS_30
+NC_000913.3	ISEScan	terminal_inverted_repeat	1470491	1470516	.		.	ID=NC_000913.3_IS_30_TIR;parent=NC_000913.3_IS_30
+NC_000913.3	ISEScan	insertion_sequence	1503157	1504865	.	+	.	ID=NC_000913.3_IS_31;family=IS200/IS605;cluster=IS200/IS605_138
+NC_000913.3	ISEScan	insertion_sequence	1530233	1531915	.	+	.	ID=NC_000913.3_IS_32;family=ISAS1;cluster=ISAS1_192
+NC_000913.3	ISEScan	terminal_inverted_repeat	1530233	1530250	.	+	.	ID=NC_000913.3_IS_32_TIR;parent=NC_000913.3_IS_32
+NC_000913.3	ISEScan	terminal_inverted_repeat	1531898	1531915	.	+	.	ID=NC_000913.3_IS_32_TIR;parent=NC_000913.3_IS_32
+NC_000913.3	ISEScan	insertion_sequence	1531672	1532962	.	+	.	ID=NC_000913.3_IS_33;family=ISAS1;cluster=ISAS1_192
+NC_000913.3	ISEScan	insertion_sequence	1650843	1651548	.		.	ID=NC_000913.3_IS_34;family=IS3;cluster=IS3_255
+NC_000913.3	ISEScan	insertion_sequence	1978503	1979270	.		.	ID=NC_000913.3_IS_35;family=IS1;cluster=IS1_316
+NC_000913.3	ISEScan	terminal_inverted_repeat	1978503	1978525	.		.	ID=NC_000913.3_IS_35_TIR;parent=NC_000913.3_IS_35
+NC_000913.3	ISEScan	terminal_inverted_repeat	1979248	1979270	.		.	ID=NC_000913.3_IS_35_TIR;parent=NC_000913.3_IS_35
+NC_000913.3	ISEScan	insertion_sequence	2066156	2067356	.	-	.	ID=NC_000913.3_IS_36;family=IS5;cluster=IS5_112
+NC_000913.3	ISEScan	terminal_inverted_repeat	2066156	2066175	.	-	.	ID=NC_000913.3_IS_36_TIR;parent=NC_000913.3_IS_36
+NC_000913.3	ISEScan	terminal_inverted_repeat	2067337	2067356	.	-	.	ID=NC_000913.3_IS_36_TIR;parent=NC_000913.3_IS_36
+NC_000913.3	ISEScan	insertion_sequence	2068949	2070262	.		.	ID=NC_000913.3_IS_37;family=IS3;cluster=IS3_255
+NC_000913.3	ISEScan	terminal_inverted_repeat	2068949	2068981	.		.	ID=NC_000913.3_IS_37_TIR;parent=NC_000913.3_IS_37
+NC_000913.3	ISEScan	terminal_inverted_repeat	2070230	2070262	.		.	ID=NC_000913.3_IS_37_TIR;parent=NC_000913.3_IS_37
+NC_000913.3	ISEScan	insertion_sequence	2101746	2102946	.		.	ID=NC_000913.3_IS_38;family=IS5;cluster=IS5_112
+NC_000913.3	ISEScan	terminal_inverted_repeat	2101746	2101764	.		.	ID=NC_000913.3_IS_38_TIR;parent=NC_000913.3_IS_38
+NC_000913.3	ISEScan	terminal_inverted_repeat	2102928	2102946	.		.	ID=NC_000913.3_IS_38_TIR;parent=NC_000913.3_IS_38
+NC_000913.3	ISEScan	insertion_sequence	2170171	2171428	.		.	ID=NC_000913.3_IS_39;family=IS3;cluster=IS3_168
+NC_000913.3	ISEScan	terminal_inverted_repeat	2170171	2170209	.		.	ID=NC_000913.3_IS_39_TIR;parent=NC_000913.3_IS_39
+NC_000913.3	ISEScan	terminal_inverted_repeat	2171390	2171428	.		.	ID=NC_000913.3_IS_39_TIR;parent=NC_000913.3_IS_39
+NC_000913.3	ISEScan	insertion_sequence	2288919	2290113	.		.	ID=NC_000913.3_IS_40;family=IS5;cluster=IS5_112
+NC_000913.3	ISEScan	terminal_inverted_repeat	2288919	2288934	.		.	ID=NC_000913.3_IS_40_TIR;parent=NC_000913.3_IS_40
+NC_000913.3	ISEScan	terminal_inverted_repeat	2290098	2290113	.		.	ID=NC_000913.3_IS_40_TIR;parent=NC_000913.3_IS_40
+NC_000913.3	ISEScan	insertion_sequence	2356423	2358077	.	+	.	ID=NC_000913.3_IS_41;family=ISNCY;cluster=ISNCY_229
+NC_000913.3	ISEScan	terminal_inverted_repeat	2356423	2356435	.	+	.	ID=NC_000913.3_IS_41_TIR;parent=NC_000913.3_IS_41
+NC_000913.3	ISEScan	terminal_inverted_repeat	2358065	2358077	.	+	.	ID=NC_000913.3_IS_41_TIR;parent=NC_000913.3_IS_41
+NC_000913.3	ISEScan	insertion_sequence	2422182	2423609	.	-	.	ID=NC_000913.3_IS_42;family=ISNCY;cluster=ISNCY_229
+NC_000913.3	ISEScan	terminal_inverted_repeat	2422182	2422191	.	-	.	ID=NC_000913.3_IS_42_TIR;parent=NC_000913.3_IS_42
+NC_000913.3	ISEScan	terminal_inverted_repeat	2423600	2423609	.	-	.	ID=NC_000913.3_IS_42_TIR;parent=NC_000913.3_IS_42
+NC_000913.3	ISEScan	insertion_sequence	2514263	2515627	.	+	.	ID=NC_000913.3_IS_43;family=IS4;cluster=IS4_169
+NC_000913.3	ISEScan	terminal_inverted_repeat	2514263	2514298	.	+	.	ID=NC_000913.3_IS_43_TIR;parent=NC_000913.3_IS_43
+NC_000913.3	ISEScan	terminal_inverted_repeat	2515592	2515627	.	+	.	ID=NC_000913.3_IS_43_TIR;parent=NC_000913.3_IS_43
+NC_000913.3	ISEScan	insertion_sequence	2996369	2997682	.		.	ID=NC_000913.3_IS_44;family=IS3;cluster=IS3_255
+NC_000913.3	ISEScan	terminal_inverted_repeat	2996369	2996401	.		.	ID=NC_000913.3_IS_44_TIR;parent=NC_000913.3_IS_44
+NC_000913.3	ISEScan	terminal_inverted_repeat	2997650	2997682	.		.	ID=NC_000913.3_IS_44_TIR;parent=NC_000913.3_IS_44
+NC_000913.3	ISEScan	insertion_sequence	3130143	3131343	.		.	ID=NC_000913.3_IS_45;family=IS5;cluster=IS5_112
+NC_000913.3	ISEScan	terminal_inverted_repeat	3130143	3130161	.		.	ID=NC_000913.3_IS_45_TIR;parent=NC_000913.3_IS_45
+NC_000913.3	ISEScan	terminal_inverted_repeat	3131325	3131343	.		.	ID=NC_000913.3_IS_45_TIR;parent=NC_000913.3_IS_45
+NC_000913.3	ISEScan	insertion_sequence	3186105	3187418	.		.	ID=NC_000913.3_IS_46;family=IS3;cluster=IS3_255
+NC_000913.3	ISEScan	terminal_inverted_repeat	3186105	3186137	.		.	ID=NC_000913.3_IS_46_TIR;parent=NC_000913.3_IS_46
+NC_000913.3	ISEScan	terminal_inverted_repeat	3187386	3187418	.		.	ID=NC_000913.3_IS_46_TIR;parent=NC_000913.3_IS_46
+NC_000913.3	ISEScan	insertion_sequence	3365553	3366753	.		.	ID=NC_000913.3_IS_47;family=IS5;cluster=IS5_112
+NC_000913.3	ISEScan	terminal_inverted_repeat	3365553	3365571	.		.	ID=NC_000913.3_IS_47_TIR;parent=NC_000913.3_IS_47
+NC_000913.3	ISEScan	terminal_inverted_repeat	3366735	3366753	.		.	ID=NC_000913.3_IS_47_TIR;parent=NC_000913.3_IS_47
+NC_000913.3	ISEScan	insertion_sequence	3542858	3544210	.	+	.	ID=NC_000913.3_IS_48;family=ISNCY;cluster=ISNCY_229
+NC_000913.3	ISEScan	terminal_inverted_repeat	3542858	3542884	.	+	.	ID=NC_000913.3_IS_48_TIR;parent=NC_000913.3_IS_48
+NC_000913.3	ISEScan	terminal_inverted_repeat	3544184	3544210	.	+	.	ID=NC_000913.3_IS_48_TIR;parent=NC_000913.3_IS_48
+NC_000913.3	ISEScan	insertion_sequence	3583428	3584195	.	+	.	ID=NC_000913.3_IS_49;family=IS1;cluster=IS1_316
+NC_000913.3	ISEScan	terminal_inverted_repeat	3583428	3583450	.	+	.	ID=NC_000913.3_IS_49_TIR;parent=NC_000913.3_IS_49
+NC_000913.3	ISEScan	terminal_inverted_repeat	3584173	3584195	.	+	.	ID=NC_000913.3_IS_49_TIR;parent=NC_000913.3_IS_49
+NC_000913.3	ISEScan	insertion_sequence	3624234	3625524	.		.	ID=NC_000913.3_IS_50;family=ISAS1;cluster=ISAS1_192
+NC_000913.3	ISEScan	terminal_inverted_repeat	3624234	3624251	.		.	ID=NC_000913.3_IS_50_TIR;parent=NC_000913.3_IS_50
+NC_000913.3	ISEScan	terminal_inverted_repeat	3625507	3625524	.		.	ID=NC_000913.3_IS_50_TIR;parent=NC_000913.3_IS_50
+NC_000913.3	ISEScan	insertion_sequence	3652033	3653233	.		.	ID=NC_000913.3_IS_51;family=IS5;cluster=IS5_112
+NC_000913.3	ISEScan	terminal_inverted_repeat	3652033	3652051	.		.	ID=NC_000913.3_IS_51_TIR;parent=NC_000913.3_IS_51
+NC_000913.3	ISEScan	terminal_inverted_repeat	3653215	3653233	.		.	ID=NC_000913.3_IS_51_TIR;parent=NC_000913.3_IS_51
+NC_000913.3	ISEScan	insertion_sequence	3720629	3722079	.	+	.	ID=NC_000913.3_IS_52;family=IS3;cluster=IS3_61
+NC_000913.3	ISEScan	terminal_inverted_repeat	3720629	3720663	.	+	.	ID=NC_000913.3_IS_52_TIR;parent=NC_000913.3_IS_52
+NC_000913.3	ISEScan	terminal_inverted_repeat	3722045	3722079	.	+	.	ID=NC_000913.3_IS_52_TIR;parent=NC_000913.3_IS_52
+NC_000913.3	ISEScan	insertion_sequence	3882060	3884180	.	-	.	ID=NC_000913.3_IS_53;family=IS21;cluster=IS21_259
+NC_000913.3	ISEScan	terminal_inverted_repeat	3882060	3882078	.	-	.	ID=NC_000913.3_IS_53_TIR;parent=NC_000913.3_IS_53
+NC_000913.3	ISEScan	terminal_inverted_repeat	3884162	3884180	.	-	.	ID=NC_000913.3_IS_53_TIR;parent=NC_000913.3_IS_53
+NC_000913.3	ISEScan	insertion_sequence	4498190	4499503	.	+	.	ID=NC_000913.3_IS_54;family=IS3;cluster=IS3_255
+NC_000913.3	ISEScan	terminal_inverted_repeat	4498190	4498222	.	+	.	ID=NC_000913.3_IS_54_TIR;parent=NC_000913.3_IS_54
+NC_000913.3	ISEScan	terminal_inverted_repeat	4499471	4499503	.	+	.	ID=NC_000913.3_IS_54_TIR;parent=NC_000913.3_IS_54
+NC_000913.3	ISEScan	insertion_sequence	4500608	4502014	.	+	.	ID=NC_000913.3_IS_55;family=IS66;cluster=IS66_345
+NC_000913.3	ISEScan	terminal_inverted_repeat	4500608	4500622	.	+	.	ID=NC_000913.3_IS_55_TIR;parent=NC_000913.3_IS_55
+NC_000913.3	ISEScan	terminal_inverted_repeat	4502000	4502014	.	+	.	ID=NC_000913.3_IS_55_TIR;parent=NC_000913.3_IS_55
+NC_000913.3	ISEScan	insertion_sequence	4502090	4503515	.	-	.	ID=NC_000913.3_IS_56;family=IS4;cluster=IS4_107
+NC_000913.3	ISEScan	terminal_inverted_repeat	4502090	4502107	.	-	.	ID=NC_000913.3_IS_56_TIR;parent=NC_000913.3_IS_56
+NC_000913.3	ISEScan	terminal_inverted_repeat	4503498	4503515	.	-	.	ID=NC_000913.3_IS_56_TIR;parent=NC_000913.3_IS_56
+NC_000913.3	ISEScan	insertion_sequence	4506742	4507804	.	+	.	ID=NC_000913.3_IS_57;family=IS3;cluster=IS3_461
+NC_000913.3	ISEScan	terminal_inverted_repeat	4506742	4506764	.	+	.	ID=NC_000913.3_IS_57_TIR;parent=NC_000913.3_IS_57
+NC_000913.3	ISEScan	terminal_inverted_repeat	4507782	4507804	.	+	.	ID=NC_000913.3_IS_57_TIR;parent=NC_000913.3_IS_57
+NC_000913.3	ISEScan	insertion_sequence	4507459	4508679	.	-	.	ID=NC_000913.3_IS_58;family=IS30;cluster=IS30_173
+NC_000913.3	ISEScan	terminal_inverted_repeat	4507459	4507484	.	-	.	ID=NC_000913.3_IS_58_TIR;parent=NC_000913.3_IS_58
+NC_000913.3	ISEScan	terminal_inverted_repeat	4508654	4508679	.	-	.	ID=NC_000913.3_IS_58_TIR;parent=NC_000913.3_IS_58
+NC_000913.3	ISEScan	insertion_sequence	4508469	4509586	.	+	.	ID=NC_000913.3_IS_59;family=IS3;cluster=IS3_176
+NC_000913.3	ISEScan	terminal_inverted_repeat	4508469	4508492	.	+	.	ID=NC_000913.3_IS_59_TIR;parent=NC_000913.3_IS_59
+NC_000913.3	ISEScan	terminal_inverted_repeat	4509563	4509586	.	+	.	ID=NC_000913.3_IS_59_TIR;parent=NC_000913.3_IS_59
+NC_000913.3	ISEScan	insertion_sequence	4509156	4510555	.	+	.	ID=NC_000913.3_IS_60;family=IS3;cluster=IS3_251
+NC_000913.3	ISEScan	terminal_inverted_repeat	4509156	4509169	.	+	.	ID=NC_000913.3_IS_60_TIR;parent=NC_000913.3_IS_60
+NC_000913.3	ISEScan	terminal_inverted_repeat	4510542	4510555	.	+	.	ID=NC_000913.3_IS_60_TIR;parent=NC_000913.3_IS_60
+NC_000913.3	ISEScan	insertion_sequence	4518472	4519239	.		.	ID=NC_000913.3_IS_61;family=IS1;cluster=IS1_316
+NC_000913.3	ISEScan	terminal_inverted_repeat	4518472	4518494	.		.	ID=NC_000913.3_IS_61_TIR;parent=NC_000913.3_IS_61
+NC_000913.3	ISEScan	terminal_inverted_repeat	4519217	4519239	.		.	ID=NC_000913.3_IS_61_TIR;parent=NC_000913.3_IS_61
+NC_000913.3	ISEScan	insertion_sequence	4568960	4569847	.	+	.	ID=NC_000913.3_IS_62;family=ISNCY;cluster=ISNCY_229
+NC_000913.3	ISEScan	terminal_inverted_repeat	4568960	4568977	.	+	.	ID=NC_000913.3_IS_62_TIR;parent=NC_000913.3_IS_62
+NC_000913.3	ISEScan	terminal_inverted_repeat	4569830	4569847	.	+	.	ID=NC_000913.3_IS_62_TIR;parent=NC_000913.3_IS_62
+NC_000913.3	ISEScan	insertion_sequence	4599995	4601990	.	-	.	ID=NC_000913.3_IS_63;family=IS21;cluster=IS21_259
+NC_000913.3	ISEScan	terminal_inverted_repeat	4599995	4600026	.	-	.	ID=NC_000913.3_IS_63_TIR;parent=NC_000913.3_IS_63
+NC_000913.3	ISEScan	terminal_inverted_repeat	4601959	4601990	.	-	.	ID=NC_000913.3_IS_63_TIR;parent=NC_000913.3_IS_63

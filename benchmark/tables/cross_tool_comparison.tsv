@@ -1,0 +1,15 @@
+Metric	DeepISE_Plan_A	DeepISE_Plan_B	ISEScan
+Curated IS Elements (Gold Standard)	50	50	50
+Predicted IS Candidates	88	87	63
+True Positives (Recovered IS)	43	42	43
+Sensitivity / Recall	86.00%	84.00%	86.00%
+Precision	48.86%	48.28%	69.35%
+F1-Score	0.6232	0.6131	0.7679
+Near Boundary Rate (<= 10 bp)	20.93%	23.81%	90.91%
+Near Boundary Rate (<= 30 bp)	30.23%	30.95%	90.91%
+Mean 5' Boundary Error	125.5 bp	144.4 bp	19.0 bp
+Mean 3' Boundary Error	115.1 bp	138.7 bp	26.1 bp
+Median Boundary Error	138.0 bp	154.0 bp	3.0 bp
+Complete Elements Detected	10	9	50
+Partial Elements Detected	75	74	13
+Total Runtime (4.64 Mb Genome)	7.38 s	9.31 s	432.00 s
