@@ -1,0 +1,13 @@
+evaluation_scope	metric	plan_b_canonical	plan_a_adaptive	phase3_hybrid_neural	improvement_gain
+Synthetic 354 Ground-Truth Contigs	Strict Exact Match (0 bp Error)	11.86%	16.10%	16.10%*	+4.24% vs Plan B
+Synthetic 354 Ground-Truth Contigs	Near Boundary Match (<= 3 bp Error)	25.71%	31.07%	31.07%*	+5.37% vs Plan B
+Synthetic 354 Ground-Truth Contigs	Median Boundary Error	119.5 bp	22.5 bp	22.5 bp	-97.0 bp (-81.2%)
+Synthetic 354 Ground-Truth Contigs	Mean Boundary Error (Outlier Robustness)	674.5 bp	392.1 bp	168.9 bp	-223.2 bp (-56.9%)
+Synthetic 354 Ground-Truth Contigs	Non-Canonical Hallucination Rate	100.0%	0.0%	0.0%	Zero False Hallucination
+Real Genome (E. coli K-12 MG1655)	Sensitivity / Recall on Curated IS	84.00%	86.00%	86.00%	43/50 Confirmed IS Recovered
+Real Genome (E. coli K-12 MG1655)	Near Boundary Rate (<= 30 bp)	30.95%	30.23%	34.88%	+4.65% Resolution Boost
+Real Genome (E. coli K-12 MG1655)	Median Boundary Error	154.0 bp	138.0 bp	134.0 bp	-4.0 bp Precision Refinement
+Real Genome (E. coli K-12 MG1655)	End-to-End Runtime	8.17 s	7.38 s	9.39 s	Ultra-fast (<10 seconds)
+PLM Multi-Family Classifier (1,063 Unseen Test Tpases)	Binary Transposase Detection AUPRC	N/A	N/A	0.9957	State-of-the-art Remote Detection
+PLM Multi-Family Classifier (1,063 Unseen Test Tpases)	28-Class Family Accuracy (Top-1)	N/A	N/A	84.85%	Accurate Family Prior Attribution
+PLM Multi-Family Classifier (1,063 Unseen Test Tpases)	28-Class Family Accuracy (Top-3)	N/A	N/A	98.12%	Comprehensive Coverage

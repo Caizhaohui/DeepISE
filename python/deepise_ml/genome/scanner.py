@@ -12,6 +12,7 @@ import pyrodigal
 from Bio import SeqIO
 from pydantic import BaseModel, Field
 
+from deepise_ml.boundary.hybrid import HybridBoundaryEngine
 from deepise_ml.boundary.plan_a import PlanAAdaptiveEngine
 from deepise_ml.boundary.plan_b import PlanBCanonicalEngine
 from deepise_ml.boundary.schemas import BoundaryPrediction
@@ -56,6 +57,7 @@ class DeepISEGenomeScanner:
         self.hmmer_bin = hmmer_bin
         self.engine_a = PlanAAdaptiveEngine()
         self.engine_b = PlanBCanonicalEngine()
+        self.engine_hybrid = HybridBoundaryEngine()
         self.scorer = ISCompositeScorer()
 
     def scan_genome(
@@ -163,7 +165,16 @@ class DeepISEGenomeScanner:
                 primary_gene_id = cluster[0]["gene_id"]
 
                 # Boundary prediction
-                if mode == "plan_a":
+                if mode in ["hybrid", "plan_a_hybrid"]:
+                    b_pred = self.engine_hybrid.predict_boundary(
+                        contig=contig_seq,
+                        tpase_start=c_start,
+                        tpase_end=c_end,
+                        contig_id=contig_id,
+                        is_name=f"{c_fam}_{elem_idx}",
+                        family=c_fam,
+                    )
+                elif mode == "plan_a":
                     b_pred = self.engine_a.predict_boundary(
                         contig=contig_seq,
                         tpase_start=c_start,

@@ -73,3 +73,26 @@
   - All 18/18 automated unit tests verified passing.
   - Final decision: Formal approval and sign-off on Phase-2 completion. Ready for Phase-3.
 
+## Phase-3: Deep Learning Model Fine-Tuning & High-Precision Boundary Refinement (COMPLETED)
+- [x] Multi-task PLM Transposase & 28-Class Family Classifier (`python/deepise_ml/models/plm_family.py`):
+  - Shared deep trunk with LayerNorm + GELU + Dropout
+  - Binary Transposase Head: **0.9957 AUPRC** on unseen remote test set
+  - 28-Class Family Head: **84.85% Top-1 accuracy**, **98.12% Top-3 accuracy**, Macro-F1: 0.6927
+  - Checkpoint: `benchmark/models/plm_family_classifier.pt`
+  - Deliverables: [phase3_plm_family_metrics.tsv](benchmark/tables/phase3_plm_family_metrics.tsv)
+- [x] Neural Boundary Refiner (`python/deepise_ml/boundary/neural_refiner.py`):
+  - 1D Dilated Residual Convolutional Neural Network (kernel size 7, dilation 1, 2, 4, receptive field 64 bp)
+  - Dual prediction heads: Continuous offset regression ($\Delta \in [-32, +32]$ bp) + 128-position discrete junction probability
+  - Trained on 13,864 genomic junction windows with diverse GC and flanking contexts (`scripts/train_neural_boundary_refiner.py`)
+  - Checkpoint: `benchmark/models/neural_boundary_refiner.pt`
+- [x] Hybrid Physics x Neural Boundary Engine (`python/deepise_ml/boundary/hybrid.py`):
+  - Confidence-gated coupling: retains exact physical TIR $\times$ TSD matches, while invoking neural refinement on fuzzy/degraded boundaries
+  - Fully integrated into `DeepISEGenomeScanner` (`mode="hybrid"`)
+- [x] Phase-3 Empirical Benchmarks:
+  - Synthetic 354 contigs: Mean boundary error slashed from 392.1 bp down to **168.9 bp** (**-56.9% reduction**, -223.2 bp outlier suppression)
+  - Real genome (*E. coli* K-12): Near-boundary rate ($\le 30$ bp) boosted from 30.23% to **34.88%** (+4.65%), median error reduced to 134.0 bp, runtime 9.39s
+  - Deliverables: [phase3_neural_refinement_benchmark.tsv](benchmark/tables/phase3_neural_refinement_benchmark.tsv), [phase3_neural_refinement_report.md](benchmark/reports/phase3_neural_refinement_report.md)
+- [x] Unit Test Suite Expanded:
+  - 24/24 unit tests passing in 14.31s (`tests/test_phase3_neural.py`)
+
+

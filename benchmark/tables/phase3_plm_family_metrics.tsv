@@ -1,0 +1,6 @@
+metric	value
+Test Binary Transposase AUPRC	0.9957
+Test Positive Family Micro-Accuracy (Top-1)	84.85%
+Test Positive Family Top-3 Accuracy	98.12%
+Test Positive Family Macro-F1	0.6927
+Number of Evaluated Families	28
