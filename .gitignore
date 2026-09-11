@@ -22,6 +22,7 @@ data/processed/embeddings/
 benchmark/tmp_*/
 benchmark/db/
 benchmark/results/*_raw.*
+data/genomes/
 
 # Virtual environments
 .env/

@@ -1,0 +1,15 @@
+metric	plan_b	plan_a	delta
+Total Curated IS (Gold Standard)	50	50	0
+Total Predicted IS Candidates	87	88	+1
+True Positives (Recovered IS)	42	43	+1
+Sensitivity / Recall	84.00%	86.00%	+2.00%
+Precision	48.28%	48.86%	+0.59%
+F1-Score	0.6131	0.6232	+0.0100
+Near Boundary Rate (<= 10 bp)	23.81%	20.93%	-2.88%
+Near Boundary Rate (<= 30 bp)	30.95%	30.23%	-0.72%
+Mean 5' Boundary Error	144.4 bp	125.5 bp	-18.9 bp
+Mean 3' Boundary Error	138.7 bp	115.1 bp	-23.6 bp
+Median Boundary Error	154.0 bp	138.0 bp	-16.0 bp
+Complete Elements Detected	9	10	+1
+Partial Elements Detected	74	75	+1
+Total Runtime (4.64 Mb Genome)	8.17 s	9.48 s	+1.32 s

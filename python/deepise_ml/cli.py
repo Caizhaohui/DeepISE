@@ -59,6 +59,8 @@ from deepise_ml.boundary.plan_a import PlanAAdaptiveEngine
 from deepise_ml.boundary.plan_b import PlanBCanonicalEngine
 from deepise_ml.boundary.evaluator import evaluate_engine_on_benchmark
 from deepise_ml.boundary.report import export_phase2_comparison_tables, generate_phase2_report_markdown
+from deepise_ml.genome.scanner import DeepISEGenomeScanner, export_genome_results
+from deepise_ml.genome.benchmark_genome import run_full_genome_benchmark
 
 app = typer.Typer(help="DeepISE Data Management CLI")
 console = Console()
@@ -667,6 +669,46 @@ def eval_phase2(
     generate_phase2_report_markdown(comp_df, fam_joined, report_path)
 
     console.print(f"[bold green]Phase-2 Benchmark Complete! Report saved to {report_path}[/bold green]")
+
+
+@app.command()
+def scan_genome(
+    fasta_path: Path = typer.Option(..., help="Path to input genome FASTA"),
+    output_dir: Path = typer.Option(Path("results/genome_scan"), help="Output directory for GFF3, TSV, FNA"),
+    mode: str = typer.Option("plan_a", help="Boundary engine mode: 'plan_a' (adaptive) or 'plan_b' (canonical)"),
+    threads: int = typer.Option(4, help="Number of CPU threads for gene prediction and HMM search"),
+    min_bitscore: float = typer.Option(10.6, help="Bitscore threshold for transposase filtering"),
+):
+    """Scan a bacterial genome FASTA file and detect full-length IS elements."""
+    console.print(f"[bold blue]Scanning genome {fasta_path} using DeepISE ({mode.upper()})...[/bold blue]")
+    scanner = DeepISEGenomeScanner(min_bitscore=min_bitscore)
+    elements = scanner.scan_genome(fasta_path, mode=mode, threads=threads)
+    console.print(f"Detected [bold green]{len(elements)}[/bold green] non-redundant IS elements.")
+
+    from Bio import SeqIO
+    contigs = {r.id: str(r.seq).upper() for r in SeqIO.parse(fasta_path, "fasta")}
+    gff_p, tsv_p, fna_p = export_genome_results(elements, contigs, output_dir)
+    console.print(f"Exported results to [green]{gff_p}[/green], [green]{tsv_p}[/green], [green]{fna_p}[/green]")
+
+
+@app.command()
+def benchmark_genome(
+    fasta_path: Path = typer.Option(Path("data/genomes/NC_000913.3.fna"), help="Reference genome FASTA"),
+    feature_table_path: Path = typer.Option(Path("data/genomes/NC_000913.3.gff"), help="NCBI curated feature table"),
+    tables_dir: Path = typer.Option(Path("benchmark/tables"), help="Tables output directory"),
+    reports_dir: Path = typer.Option(Path("benchmark/reports"), help="Reports output directory"),
+    results_dir: Path = typer.Option(Path("benchmark/results"), help="Results output directory"),
+):
+    """Run full-genome end-to-end benchmark on reference genome (e.g. E. coli K-12)."""
+    console.print("[bold yellow]=== Running Real Bacterial Genome End-to-End Benchmark ===[/bold yellow]")
+    run_full_genome_benchmark(
+        fasta_path=fasta_path,
+        feature_table_path=feature_table_path,
+        tables_dir=tables_dir,
+        reports_dir=reports_dir,
+        results_dir=results_dir,
+    )
+    console.print("[bold green]Genome Benchmark Completed Successfully![/bold green]")
 
 
 if __name__ == "__main__":

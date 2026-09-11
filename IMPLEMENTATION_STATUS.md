@@ -43,3 +43,15 @@
   - [phase2_family_comparison.tsv](benchmark/tables/phase2_family_comparison.tsv) (Per-family breakdown across 23 families)
   - [phase2_plan_a_vs_b.md](benchmark/reports/phase2_plan_a_vs_b.md) (Comprehensive technical evaluation report)
 - [x] Architectural Decision: Adopt **Plan A (Full-Family Adaptive Engine)** as the production core, retaining Plan B as a lightweight `--fast-coarse` prefilter.
+
+## Phase-2 Extension: Full-Length IS Composite Scorer & Real Genome Benchmark (COMPLETED)
+- [x] Full-length IS element composite scorer (`python/deepise_ml/composite/scorer.py`, joint $S_{\text{Tpase}} + S_{\text{Boundary}} + S_{\text{TSD}} + S_{\text{Architecture}} + S_{\text{Length}}$ formulation with complete/partial/pseudo classification)
+- [x] High-throughput bacterial gene caller integration via `pyrodigal` (3.7.1, C-accelerated Prodigal wrapper, 4,319 ORFs predicted in 6.3s)
+- [x] End-to-end bacterial genome scanner (`python/deepise_ml/genome/scanner.py`, `deepise-ml scan-genome`) with GFF3, TSV, and FASTA export
+- [x] Ground-truth reference genome benchmark on *Escherichia coli* K-12 MG1655 (`NC_000913.3`, 4.64 Mb):
+  - 43/50 curated IS elements successfully recovered (**Sensitivity: 86.00%**, F1: 0.6232)
+  - Total end-to-end runtime on 4.64 Mb genome: **8.5 - 9.5 seconds**
+  - [real_genome_ecoli_results.tsv](benchmark/tables/real_genome_ecoli_results.tsv)
+  - [real_genome_benchmark.md](benchmark/reports/real_genome_benchmark.md)
+  - Annotated IS outputs: `benchmark/results/ecoli_k12_plan_a/deepise_is_elements.gff3`
+- [x] Unit test suite expanded to 18/18 passing tests (`tests/test_composite_and_genome.py`, 4.41s)
