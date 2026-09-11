@@ -54,6 +54,11 @@ from deepise_ml.benchmark.report import (
     generate_phase1_benchmark_report,
     generate_go_no_go_report,
 )
+from deepise_ml.boundary.benchmark_dataset import build_benchmark_contigs
+from deepise_ml.boundary.plan_a import PlanAAdaptiveEngine
+from deepise_ml.boundary.plan_b import PlanBCanonicalEngine
+from deepise_ml.boundary.evaluator import evaluate_engine_on_benchmark
+from deepise_ml.boundary.report import export_phase2_comparison_tables, generate_phase2_report_markdown
 
 app = typer.Typer(help="DeepISE Data Management CLI")
 console = Console()
@@ -608,6 +613,60 @@ def eval_phase1(
     generate_go_no_go_report(overall_df, strat_df_all, reports_dir / "go_no_go.md")
 
     console.print(f"[bold green]Phase-1 Benchmark Reports generated in {reports_dir}[/bold green]")
+
+
+@app.command()
+def build_boundary_benchmark(
+    elements_parquet: Path = typer.Option(Path("data/processed/is_elements.parquet"), help="Processed elements parquet"),
+    test_split_parquet: Path = typer.Option(Path("data/splits/cluster30/test_combined.parquet"), help="Test split parquet"),
+    val_split_parquet: Path = typer.Option(Path("data/splits/cluster30/validation_combined.parquet"), help="Validation split parquet"),
+    tpases_parquet: Path = typer.Option(Path("data/processed/tpases.parquet"), help="Processed tpases parquet"),
+    output_parquet: Path = typer.Option(Path("data/benchmark/phase2_ground_truth.parquet"), help="Output benchmark contigs"),
+    max_elements: int = typer.Option(350, help="Max benchmark elements"),
+):
+    """Build Phase-2 IS element boundary ground-truth benchmark contigs."""
+    console.print("[bold blue]Generating Phase-2 boundary ground-truth benchmark contigs...[/bold blue]")
+    df = build_benchmark_contigs(
+        elements_parquet=elements_parquet,
+        test_split_parquet=test_split_parquet,
+        val_split_parquet=val_split_parquet,
+        tpases_parquet=tpases_parquet,
+        output_parquet=output_parquet,
+        max_elements=max_elements,
+    )
+    console.print(f"[bold green]Successfully generated {len(df)} benchmark contigs in {output_parquet}[/bold green]")
+
+
+@app.command()
+def eval_phase2(
+    benchmark_parquet: Path = typer.Option(Path("data/benchmark/phase2_ground_truth.parquet"), help="Benchmark contigs parquet"),
+    tables_dir: Path = typer.Option(Path("benchmark/tables"), help="Output tables directory"),
+    reports_dir: Path = typer.Option(Path("benchmark/reports"), help="Output reports directory"),
+):
+    """Run dual-track comparative evaluation of Plan A vs Plan B on the ground-truth benchmark."""
+    console.print("[bold yellow]=== Running Phase-2 Dual-Track Comparative Benchmark (Plan A vs Plan B) ===[/bold yellow]")
+    assert benchmark_parquet.exists(), f"Benchmark file {benchmark_parquet} does not exist. Run build-boundary-benchmark first."
+    bench_df = pl.read_parquet(benchmark_parquet)
+    console.print(f"Loaded {len(bench_df)} benchmark contigs across {bench_df['family'].n_unique()} IS families.")
+
+    # 1. Run Plan B
+    console.print("[bold cyan]Evaluating Plan B (Canonical TIR/TSD Prototype Engine)...[/bold cyan]")
+    engine_b = PlanBCanonicalEngine()
+    preds_b, metrics_b, fam_b = evaluate_engine_on_benchmark(engine_b, bench_df, "plan_b")
+    console.print(f"Plan B Near Match (<=3bp): {metrics_b['near_match_rate_3bp']*100:.2f}% | Latency: {metrics_b['avg_latency_ms']:.2f}ms")
+
+    # 2. Run Plan A
+    console.print("[bold green]Evaluating Plan A (Full-Family Adaptive Engine)...[/bold green]")
+    engine_a = PlanAAdaptiveEngine()
+    preds_a, metrics_a, fam_a = evaluate_engine_on_benchmark(engine_a, bench_df, "plan_a")
+    console.print(f"Plan A Near Match (<=3bp): {metrics_a['near_match_rate_3bp']*100:.2f}% | Latency: {metrics_a['avg_latency_ms']:.2f}ms")
+
+    # 3. Export comparative tables & report
+    comp_df, fam_joined = export_phase2_comparison_tables(metrics_a, metrics_b, fam_a, fam_b, tables_dir)
+    report_path = reports_dir / "phase2_plan_a_vs_b.md"
+    generate_phase2_report_markdown(comp_df, fam_joined, report_path)
+
+    console.print(f"[bold green]Phase-2 Benchmark Complete! Report saved to {report_path}[/bold green]")
 
 
 if __name__ == "__main__":

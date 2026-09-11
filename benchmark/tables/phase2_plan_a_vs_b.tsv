@@ -1,0 +1,20 @@
+metric	plan_b	plan_a	delta
+Total Benchmark Elements	354	354	0
+Exact Match Rate (0 bp error)	11.86%	16.10%	+4.24%
+Near Match Rate (<= 3 bp error)	25.71%	31.07%	+5.37%
+Coarse Match Rate (<= 10 bp error)	39.27%	45.20%	+5.93%
+Canonical Families (Near <= 3 bp)	32.76%	37.93%	+5.17%
+Non-Canonical Families (Near <= 3 bp)	12.30%	18.03%	+5.74%
+Mean 5' Start Error (bp)	147.4 bp	133.2 bp	-14.1 bp
+Mean 3' End Error (bp)	129.9 bp	79.0 bp	-50.9 bp
+Median Boundary Error (bp)	119.5 bp	22.5 bp	-97.0 bp
+TIR Precision (Canonical)	52.16%	58.19%	+6.03%
+TIR Recall (Canonical)	53.30%	59.47%	+6.17%
+TIR F1-Score (Canonical)	0.5272	0.5882	+0.0610
+TSD Precision (Canonical)	34.06%	36.52%	+2.46%
+TSD Recall (Canonical)	33.62%	36.21%	+2.59%
+TSD F1-Score (Canonical)	0.3384	0.3636	+0.0252
+Non-Canonical False TIR Hallucination	100.00%	0.00%	-100.00%
+Non-Canonical False TSD Hallucination	98.36%	0.00%	-98.36%
+Throughput (elements / sec)	127.2	118.4	-8.8
+Average Latency per Element	7.84 ms	8.42 ms	+0.58 ms

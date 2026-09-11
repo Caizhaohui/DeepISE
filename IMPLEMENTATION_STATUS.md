@@ -29,3 +29,17 @@
 - [x] Identity-stratified benchmark (<20%, 20-30%, 30-50%, 50-70%, >70%)
 - [x] Macro-family evaluation (ESM2-LR: 96.05%, Whole-pHMM: 96.57%, BLASTP: 95.72%, MMseqs2: 95.16%)
 - [x] Phase-1 benchmark report & Go/No-Go decision (`benchmark/reports/phase1_benchmark.md`, `go_no_go.md`: DECISION: GO to Phase-2)
+
+## Phase-2: Boundary Inference & Dual-Track Comparative Evaluation (COMPLETED)
+- [x] Ground-truth IS element boundary benchmark construction (`data/benchmark/phase2_ground_truth.parquet`, 354 contigs across 23 families with verified left/right boundaries, TIR, TSD, and realistic genomic flanking context)
+- [x] Fast seed-and-extend terminal inverted repeat (TIR) detector (`python/deepise_ml/boundary/tir.py`, <1ms execution, mismatch & indel tolerant)
+- [x] Target site duplication (TSD) direct repeat scanner (`python/deepise_ml/boundary/tsd.py`, micro-shift cleavage recovery, 2-14 bp detection)
+- [x] Track B: Canonical TIR/TSD prototype engine (`python/deepise_ml/boundary/plan_b.py`, baseline standard paradigm)
+- [x] Track A: Full-family adaptive engine (`python/deepise_ml/boundary/plan_a.py`, `special_families.py` with IS200/IS605 stem-loop hairpin detection, IS91 ori/ter motif recognition, IS110 recombinase subterminal boundaries, and canonical joint TIR x TSD geometric priors)
+- [x] Automated unit test suite (`tests/test_boundary.py`, 15/15 unit tests passing in 8.37s)
+- [x] Unified dual-track comparative benchmark (`deepise-ml eval-phase2`)
+- [x] Phase-2 comparative evaluation deliverables:
+  - [phase2_plan_a_vs_b.tsv](benchmark/tables/phase2_plan_a_vs_b.tsv) (Overall comparative metrics)
+  - [phase2_family_comparison.tsv](benchmark/tables/phase2_family_comparison.tsv) (Per-family breakdown across 23 families)
+  - [phase2_plan_a_vs_b.md](benchmark/reports/phase2_plan_a_vs_b.md) (Comprehensive technical evaluation report)
+- [x] Architectural Decision: Adopt **Plan A (Full-Family Adaptive Engine)** as the production core, retaining Plan B as a lightweight `--fast-coarse` prefilter.
