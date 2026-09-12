@@ -95,4 +95,36 @@
 - [x] Unit Test Suite Expanded:
   - 24/24 unit tests passing in 14.31s (`tests/test_phase3_neural.py`)
 
+## Phase-4: Engineering Release & Metagenomic Production Deployment (COMPLETED)
+- [x] Metagenomic Production Scanner Engine (`python/deepise_ml/metagenome/scanner.py`, `MetagenomeScanner`):
+  - Lazy memory-bounded streaming iterator (`SeqIO.parse`) with batch chunking to process arbitrary FASTA file sizes with bounded RAM (<1 GB).
+  - Contig length pre-filtering (`min_contig_len=500` bp default) skipping non-informative assembly noise.
+  - Integration of C-accelerated metagenomic gene prediction via `pyrodigal.GeneFinder(meta=True)`, bypassing chromosome-level training and capturing terminal partial genes (`partial_begin`, `partial_end`).
+  - Batch HMMER transposase vectorization: aggregates ORFs across hundreds of contigs into single multi-threaded search passes for maximum CPU throughput.
+- [x] Edge-Truncation Classification & Coordinate Clamping:
+  - Robust classification of fragmented elements into `complete`, `edge_5p_truncated`, `edge_3p_truncated`, `edge_both_truncated`, and `internal_partial`.
+  - Boundary coordinate clamping to strictly valid contig ranges `[0, len(contig)]` with biological family distance priors.
+- [x] Unified Production CLI Packaging (`pyproject.toml`, `python/deepise_ml/cli.py`):
+  - Registered console scripts `deepise`, `deepise-ml`, and `deepise-data` installed via editable develop setup.
+  - Primary command `deepise scan`: Universal scanner auto-detecting complete chromosomes vs multi-contig metagenomic streams.
+  - Dedicated command `deepise scan-metagenome`: Configurable contig filtering, batching, and boundary modes (`hybrid`, `plan_a`, `plan_b`).
+  - Dedicated command `deepise benchmark-metagenome`: Automated benchmark execution across synthetic and real assemblies.
+  - Utility command `deepise version`: Displaying runtime versions, GPU status, neural refiner checkpoint, and pHMM database.
+- [x] Full Production File Export Suite (`export_metagenome_results`):
+  - Standard GFF3 (`deepise_is_elements.gff3`) with attributes: `ID`, `Name`, `Family`, `Status`, `Truncation`, `Score`, `Contig_Length`, `Method`.
+  - Rich TSV table (`deepise_is_elements.tsv`).
+  - Nucleotide sequences (`deepise_is_elements.fna`).
+  - Transposase protein translations (`deepise_tpases.faa`).
+  - Machine-readable JSON summary (`deepise_summary.json`).
+- [x] Synthetic & Real Metagenomic Benchmarks (`python/deepise_ml/metagenome/benchmark.py`):
+  - 170-contig ground-truth synthetic metagenome benchmark: **83.33% recall**, **92.00% specificity** on negative background contigs, **91.00% truncation classification accuracy**.
+  - Real clinical multi-contig draft WGS assembly (*Klebsiella pneumoniae* 04A025, 15 contigs, 1.41 Mb): **14 IS elements detected** across 9 families in 18.06s.
+  - Deliverables:
+    - [phase4_metagenome_benchmark.tsv](benchmark/tables/phase4_metagenome_benchmark.tsv)
+    - [phase4_metagenomics_report.md](benchmark/reports/phase4_metagenomics_report.md)
+- [x] Automated Unit Test Suite Expanded & Verified:
+  - `tests/test_phase4_metagenome.py`: Contig filtering, edge truncation, artifact exports, and CLI invocation.
+  - Full suite: **28/28 passing unit tests** across all modules in 15.65s.
+
+
 

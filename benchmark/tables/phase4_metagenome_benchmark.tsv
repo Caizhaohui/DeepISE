@@ -1,0 +1,4 @@
+Dataset	Engine	Recall	Specificity	Truncation_Accuracy	Complete_Boundary_MAE_bp	Complete_Near_Match_3bp	Runtime_s	Throughput_Mbp_s
+Synthetic Benchmark (170 contigs)	Plan A (Adaptive Physics)	0.8333	0.92	0.91	57.45	0.4043	5.439	0.06
+Synthetic Benchmark (170 contigs)	Hybrid (Physics + CNN Refiner)	0.8333	0.92	0.91	60.39	0.1915	6.88	0.05
+Real Draft WGS (K. pneumoniae, 15 contigs)	Hybrid (Production)						18.066	0.08

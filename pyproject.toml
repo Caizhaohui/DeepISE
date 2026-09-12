@@ -28,6 +28,8 @@ dependencies = [
 ]
 
 [project.scripts]
+deepise = "deepise_ml.cli:app"
+deepise-ml = "deepise_ml.cli:app"
 deepise-data = "deepise_ml.cli:app"
 
 [tool.setuptools.packages.find]

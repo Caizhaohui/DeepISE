@@ -23,6 +23,8 @@ benchmark/tmp_*/
 benchmark/db/
 benchmark/results/*_raw.*
 data/genomes/
+data/metagenomes/*.fna
+results/
 
 # Virtual environments
 .env/

@@ -61,6 +61,15 @@ from deepise_ml.boundary.evaluator import evaluate_engine_on_benchmark
 from deepise_ml.boundary.report import export_phase2_comparison_tables, generate_phase2_report_markdown
 from deepise_ml.genome.scanner import DeepISEGenomeScanner, export_genome_results
 from deepise_ml.genome.benchmark_genome import run_full_genome_benchmark
+from deepise_ml.metagenome.scanner import (
+    MetagenomeScanner,
+    export_metagenome_results,
+    scan_metagenome_file,
+)
+from deepise_ml.metagenome.benchmark import (
+    build_synthetic_metagenome,
+    run_full_metagenome_benchmark,
+)
 
 app = typer.Typer(help="DeepISE Data Management CLI")
 console = Console()
@@ -709,6 +718,116 @@ def benchmark_genome(
         results_dir=results_dir,
     )
     console.print("[bold green]Genome Benchmark Completed Successfully![/bold green]")
+
+
+@app.command()
+def scan(
+    fasta_path: Path = typer.Option(..., "--fasta", "-f", help="Path to input FASTA file (complete genome or metagenome contigs)"),
+    output_dir: Path = typer.Option(Path("results/deepise_scan"), "--outdir", "-o", help="Output directory for results"),
+    mode: str = typer.Option("hybrid", "--mode", "-m", help="Boundary engine mode: 'hybrid' (physics+CNN), 'plan_a', or 'plan_b'"),
+    threads: int = typer.Option(4, "--threads", "-t", help="Number of CPU threads"),
+    meta: bool = typer.Option(False, "--meta", "--metagenome", help="Force metagenomic mode (Pyrodigal meta + contig streaming)"),
+    min_contig_len: int = typer.Option(500, "--min-contig-len", help="Minimum contig length filter in metagenome mode"),
+    min_bitscore: float = typer.Option(10.6, "--min-bitscore", help="Bitscore threshold for transposase filtering"),
+    batch_size: int = typer.Option(1000, "--batch-size", help="Batch size of contigs for streaming processing"),
+):
+    """Universal DeepISE scanner for complete bacterial genomes, draft assemblies, and metagenomes."""
+    from Bio import SeqIO
+    is_multi_contig = meta
+    if not is_multi_contig:
+        records_sample = []
+        for r in SeqIO.parse(fasta_path, "fasta"):
+            records_sample.append(r)
+            if len(records_sample) >= 5:
+                break
+        if len(records_sample) > 1 or any(len(r.seq) < 100_000 for r in records_sample):
+            is_multi_contig = True
+
+    if is_multi_contig:
+        console.print(f"[bold cyan]Running DeepISE Metagenomic Production Scanner on {fasta_path}...[/bold cyan]")
+        scanner = MetagenomeScanner(
+            min_bitscore=min_bitscore,
+            min_contig_len=min_contig_len,
+            batch_size=batch_size,
+            boundary_mode=mode,
+        )
+        elements, stats = scanner.scan(fasta_path=fasta_path, threads=threads)
+        gff_p, tsv_p, fna_p, faa_p, json_p = export_metagenome_results(elements, stats, output_dir)
+        console.print(f"Detected [bold green]{len(elements)}[/bold green] IS elements in {stats['runtime_seconds']}s ({stats['throughput_mbp_per_sec']} Mbp/s).")
+        console.print(f"Breakdown: {stats['breakdown_by_status']['complete']} complete, {stats['breakdown_by_status']['partial']} partial, {stats['breakdown_by_status']['pseudo']} pseudo.")
+        console.print(f"Outputs written to [green]{output_dir}[/green]:")
+        console.print(f"  - GFF3: [green]{gff_p.name}[/green]")
+        console.print(f"  - TSV:  [green]{tsv_p.name}[/green]")
+        console.print(f"  - FNA:  [green]{fna_p.name}[/green]")
+        console.print(f"  - FAA:  [green]{faa_p.name}[/green]")
+        console.print(f"  - JSON: [green]{json_p.name}[/green]")
+    else:
+        console.print(f"[bold blue]Running DeepISE Single-Genome Scanner on {fasta_path}...[/bold blue]")
+        scanner = DeepISEGenomeScanner(min_bitscore=min_bitscore)
+        elements = scanner.scan_genome(fasta_path, mode=mode, threads=threads)
+        contigs = {r.id: str(r.seq).upper() for r in SeqIO.parse(fasta_path, "fasta")}
+        gff_p, tsv_p, fna_p = export_genome_results(elements, contigs, output_dir)
+        console.print(f"Detected [bold green]{len(elements)}[/bold green] IS elements.")
+        console.print(f"Exported results to [green]{gff_p}[/green], [green]{tsv_p}[/green], [green]{fna_p}[/green]")
+
+
+@app.command()
+def scan_metagenome(
+    fasta_path: Path = typer.Option(..., "--fasta", "-f", help="Path to metagenomic contigs FASTA"),
+    output_dir: Path = typer.Option(Path("results/metagenome_scan"), "--outdir", "-o", help="Output directory"),
+    mode: str = typer.Option("hybrid", "--mode", "-m", help="Boundary engine mode: 'hybrid', 'plan_a', or 'plan_b'"),
+    threads: int = typer.Option(4, "--threads", "-t", help="Number of CPU threads"),
+    min_contig_len: int = typer.Option(500, "--min-contig-len", help="Minimum contig length filter"),
+    min_bitscore: float = typer.Option(10.6, "--min-bitscore", help="Bitscore threshold for transposases"),
+    batch_size: int = typer.Option(1000, "--batch-size", help="Batch size of contigs for streaming processing"),
+):
+    """Scan fragmented metagenomes or multi-contig MAGs with edge-truncation classification."""
+    console.print(f"[bold cyan]Scanning metagenome contigs from {fasta_path} using mode={mode.upper()}...[/bold cyan]")
+    scanner = MetagenomeScanner(
+        min_bitscore=min_bitscore,
+        min_contig_len=min_contig_len,
+        batch_size=batch_size,
+        boundary_mode=mode,
+    )
+    elements, stats = scanner.scan(fasta_path=fasta_path, threads=threads)
+    gff_p, tsv_p, fna_p, faa_p, json_p = export_metagenome_results(elements, stats, output_dir)
+    console.print(f"Detected [bold green]{len(elements)}[/bold green] IS elements in {stats['runtime_seconds']}s ({stats['throughput_mbp_per_sec']} Mbp/s).")
+    console.print(f"Outputs written to [green]{output_dir}[/green]: GFF3, TSV, FNA, FAA, JSON.")
+
+
+@app.command()
+def benchmark_metagenome(
+    synthetic_fna: Path = typer.Option(Path("data/metagenomes/synthetic_metagenome_benchmark.fna"), help="Synthetic benchmark FASTA"),
+    synthetic_gt_tsv: Path = typer.Option(Path("data/metagenomes/synthetic_metagenome_ground_truth.tsv"), help="Ground truth TSV"),
+    real_fna: Path = typer.Option(Path("data/metagenomes/klebsiella_pneumoniae_draft.fna"), help="Real draft WGS FASTA"),
+    tables_dir: Path = typer.Option(Path("benchmark/tables"), help="Tables output directory"),
+    reports_dir: Path = typer.Option(Path("benchmark/reports"), help="Reports output directory"),
+    results_dir: Path = typer.Option(Path("benchmark/results"), help="Results output directory"),
+    threads: int = typer.Option(4, help="CPU threads"),
+):
+    """Execute complete Phase-4 metagenomic benchmark across synthetic contigs and real draft assemblies."""
+    console.print("[bold yellow]=== Running Phase-4 Metagenomics Production Benchmark ===[/bold yellow]")
+    tbl_p, rep_p = run_full_metagenome_benchmark(
+        synthetic_fna=synthetic_fna,
+        synthetic_gt_tsv=synthetic_gt_tsv,
+        real_fna=real_fna,
+        tables_dir=tables_dir,
+        reports_dir=reports_dir,
+        results_dir=results_dir,
+        threads=threads,
+    )
+    console.print(f"[bold green]Phase-4 Benchmark complete! Table: {tbl_p}, Report: {rep_p}[/bold green]")
+
+
+@app.command()
+def version():
+    """Print DeepISE version and execution environment info."""
+    import torch
+    console.print("[bold cyan]DeepISE[/bold cyan] version [green]0.1.0[/green]")
+    console.print(f"PyTorch: {torch.__version__} (CUDA available: {torch.cuda.is_available()})")
+    console.print("Neural Boundary Refiner: [green]benchmark/models/neural_boundary_refiner.pt[/green]")
+    console.print("PLM Multi-Task Classifier: [green]benchmark/models/plm_family_classifier.pt[/green]")
+    console.print("Profile HMM Database: [green]benchmark/db/deepise_tpases.hmm[/green]")
 
 
 if __name__ == "__main__":

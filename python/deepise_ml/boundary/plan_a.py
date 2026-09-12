@@ -195,7 +195,7 @@ class PlanAAdaptiveEngine:
         if best_cand is not None and best_score > 5.0:
             ref_l, ref_r, sel_tir, sel_tsd, raw_sc = best_cand
             conf = min(0.98, max(0.40, raw_sc / 65.0))
-            is_comp = True if (sel_tir and conf >= 0.5) else False
+            is_comp = True if (sel_tir is not None and (conf >= 0.45 or sel_tir.length >= 10 or sel_tsd is not None)) else False
             pred = BoundaryPrediction(
                 contig_id=contig_id,
                 is_name=is_name,
