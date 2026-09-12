@@ -1,0 +1,5 @@
+Identity Bin	ESM-2 (35M) Recall (%)	ESM-2 (35M) N_Recalled	ESM-2 (35M) N_Total	SaProt (35M) Recall (%)	SaProt (35M) N_Recalled	SaProt (35M) N_Total	ESM-2 (8M) Recall (%)	ESM-2 (8M) N_Recalled	ESM-2 (8M) N_Total
+<20% (Twilight)	81.69	58	71	52.11	37	71	60.56	43	71
+20-30% (Remote)	99.55	220	221	97.74	216	221	97.29	215	221
+30-50% (Medium)	100.0	751	751	97.6	733	751	99.87	750	751
+>=50% (Close)	95.0	19	20	100.0	20	20	70.0	14	20
