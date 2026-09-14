@@ -36,9 +36,11 @@ scripts/prepare_production_manifest.py
 scripts/run_cohort_batch.py
 scripts/submit_*.sh
 scripts/aggregate_cohort_results.py
+scripts/aggregate_phase3_production.py
 scripts/extract_gene_editing_candidates.py
 DEEPISE_INTERNAL_MIRROR_LARGE_SCALE_TESTING_PLAN.md
 CODEX_IMPLEMENTATION_PLAN.md
+DeepISE Scientific Audit & Development Correction Plan.md
 
 # Virtual environments
 .env/
