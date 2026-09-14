@@ -70,6 +70,22 @@ from deepise_ml.metagenome.benchmark import (
     build_synthetic_metagenome,
     run_full_metagenome_benchmark,
 )
+from deepise_ml.models.plm_registry import PluggablePLMEngine
+from deepise_ml.screening.closed_loop import perform_closed_loop_research_validation
+from deepise_ml.screening.evidence import HomologyContractError
+from deepise_ml.screening.homology import HomologyAdapterError
+from deepise_ml.screening.pipeline import (
+    HomologyScreeningPaths,
+    ProteinHomologyScreeningService,
+)
+from deepise_ml.screening.research_service import ProteinResearchScreeningService
+from deepise_ml.screening.runtime import (
+    ProteinScreeningError,
+    ProteinScreeningService,
+    load_classifier,
+    read_protein_fasta,
+    resolve_profile,
+)
 
 app = typer.Typer(help="DeepISE Data Management CLI")
 console = Console()
@@ -720,6 +736,134 @@ def benchmark_genome(
     console.print("[bold green]Genome Benchmark Completed Successfully![/bold green]")
 
 
+@app.command("screen-proteins")
+def screen_proteins(
+    fasta_path: Path = typer.Option(..., "--fasta", "-f", help="Protein FASTA input"),
+    profile: str = typer.Option("standard", "--profile", help="Stage-1 profile: 'fast' or 'standard'"),
+    output_path: Path = typer.Option(Path("results/protein_screening/predictions.tsv"), "--output", "-o", help="Prediction TSV output"),
+    model_dir: Path = typer.Option(Path("benchmark/models"), "--model-dir", help="Classifier artifact directory"),
+    device: Optional[str] = typer.Option(None, "--device", help="Embedding device, such as 'cpu' or 'cuda'"),
+    batch_size: int = typer.Option(32, "--batch-size", min=1, help="Protein embedding batch size"),
+    minimum_length: int = typer.Option(50, "--minimum-length", min=1, help="Minimum accepted protein length"),
+    maximum_length: int = typer.Option(2000, "--maximum-length", min=1, help="Maximum accepted protein length"),
+):
+    try:
+        resolved_profile = resolve_profile(profile, model_dir)
+        classifier = load_classifier(resolved_profile)
+        proteins = read_protein_fasta(fasta_path, minimum_length, maximum_length)
+        engine = PluggablePLMEngine(model_key=resolved_profile.model_key, device=device)
+        service = ProteinScreeningService(
+            embedding_engine=engine,
+            classifier=classifier,
+            profile=resolved_profile,
+        )
+        records = service.write_predictions(proteins, output_path, batch_size)
+    except ProteinScreeningError as error:
+        console.print(f"[red]Protein screening failed: {error}[/red]")
+        raise typer.Exit(code=1)
+    console.print(
+        f"[green]Wrote {len(records)} Stage-1 protein predictions to {output_path}[/green]"
+    )
+
+
+@app.command("screen-proteins-homology")
+def screen_proteins_homology(
+    fasta_path: Path = typer.Option(..., "--fasta", "-f", help="Protein FASTA input"),
+    reference_fasta: Path = typer.Option(..., "--reference-fasta", help="Reference protein FASTA for MMseqs2"),
+    hmm_database: Path = typer.Option(..., "--hmm-database", help="Pressed HMM database for HMMER"),
+    profile: str = typer.Option("standard", "--profile", help="Stage-1 profile: 'fast' or 'standard'"),
+    output_path: Path = typer.Option(Path("results/protein_screening_homology/predictions.tsv"), "--output", "-o", help="Combined prediction TSV output"),
+    mmseqs_bin: Optional[Path] = typer.Option(None, "--mmseqs-bin", help="Explicit path to mmseqs executable"),
+    hmmsearch_bin: Optional[Path] = typer.Option(None, "--hmmsearch-bin", help="Explicit path to hmmsearch executable"),
+    model_dir: Path = typer.Option(Path("benchmark/models"), "--model-dir", help="Classifier artifact directory"),
+    device: Optional[str] = typer.Option(None, "--device", help="Embedding device, such as 'cpu' or 'cuda'"),
+    batch_size: int = typer.Option(32, "--batch-size", min=1, help="Protein embedding batch size"),
+    threads: int = typer.Option(1, "--threads", "-t", min=1, help="Number of CPU threads for homology searches"),
+    minimum_length: int = typer.Option(50, "--minimum-length", min=1, help="Minimum accepted protein length"),
+    maximum_length: int = typer.Option(2000, "--maximum-length", min=1, help="Maximum accepted protein length"),
+):
+    """Stage-1 PLM screening combined with MMseqs2 and HMMER homology evidence and deterministic routing."""
+    try:
+        resolved_profile = resolve_profile(profile, model_dir)
+        classifier = load_classifier(resolved_profile)
+        proteins = read_protein_fasta(fasta_path, minimum_length, maximum_length)
+        paths = HomologyScreeningPaths(
+            output_tsv=output_path,
+            reference_fasta=reference_fasta,
+            hmm_database=hmm_database,
+        )
+        paths.validate_inputs_and_destinations()
+        engine = PluggablePLMEngine(model_key=resolved_profile.model_key, device=device)
+        service = ProteinHomologyScreeningService(
+            embedding_engine=engine,
+            classifier=classifier,
+            profile=resolved_profile,
+            mmseqs_binary=mmseqs_bin,
+            hmmer_binary=hmmsearch_bin,
+            threads=threads,
+        )
+        records = service.screen_and_route(proteins, paths, batch_size=batch_size)
+    except (ProteinScreeningError, HomologyAdapterError, HomologyContractError) as error:
+        console.print(f"[red]Homology screening failed: {error}[/red]")
+        raise typer.Exit(code=1)
+    console.print(
+        f"[green]Wrote {len(records)} routed protein predictions to {output_path}[/green]"
+    )
+
+
+@app.command("screen-proteins-research")
+def screen_proteins_research(
+    fasta_path: Path = typer.Option(..., "--fasta", "-f", help="Protein FASTA input"),
+    reference_fasta: Path = typer.Option(..., "--reference-fasta", help="Reference protein FASTA for MMseqs2"),
+    hmm_database: Path = typer.Option(..., "--hmm-database", help="Pressed HMM database for HMMER"),
+    profile: str = typer.Option("standard", "--profile", help="Stage-1 profile: 'fast' or 'standard'"),
+    output_path: Path = typer.Option(Path("results/protein_screening_research/predictions.tsv"), "--output", "-o", help="Comprehensive research prediction TSV output"),
+    mmseqs_bin: Optional[Path] = typer.Option(None, "--mmseqs-bin", help="Explicit path to mmseqs executable"),
+    hmmsearch_bin: Optional[Path] = typer.Option(None, "--hmmsearch-bin", help="Explicit path to hmmsearch executable"),
+    model_dir: Path = typer.Option(Path("benchmark/models"), "--model-dir", help="Classifier artifact directory"),
+    device: Optional[str] = typer.Option(None, "--device", help="Embedding device, such as 'cpu' or 'cuda'"),
+    batch_size: int = typer.Option(32, "--batch-size", min=1, help="Protein embedding batch size"),
+    threads: int = typer.Option(1, "--threads", "-t", min=1, help="Number of CPU threads for homology searches"),
+    minimum_length: int = typer.Option(50, "--minimum-length", min=1, help="Minimum accepted protein length"),
+    maximum_length: int = typer.Option(2000, "--maximum-length", min=1, help="Maximum accepted protein length"),
+    enable_stage2a: bool = typer.Option(True, "--enable-stage2a/--disable-stage2a", help="Enable ProstT5 fast 3Di structure rescue"),
+    enable_stage2b: bool = typer.Option(True, "--enable-stage2b/--disable-stage2b", help="Enable explicit 3D modeling and SaProt validation"),
+):
+    """Full hierarchical research screening combining Stage 1, Homology, Stage 2A ProstT5, Stage 2B SaProt, and Evidence Fusion."""
+    try:
+        resolved_profile = resolve_profile(profile, model_dir)
+        classifier = load_classifier(resolved_profile)
+        proteins = read_protein_fasta(fasta_path, minimum_length, maximum_length)
+        paths = HomologyScreeningPaths(
+            output_tsv=output_path,
+            reference_fasta=reference_fasta,
+            hmm_database=hmm_database,
+        )
+        paths.validate_inputs_and_destinations()
+        engine = PluggablePLMEngine(model_key=resolved_profile.model_key, device=device)
+        service = ProteinResearchScreeningService(
+            embedding_engine=engine,
+            classifier=classifier,
+            profile=resolved_profile,
+            mmseqs_binary=mmseqs_bin,
+            hmmer_binary=hmmsearch_bin,
+            threads=threads,
+        )
+        records = service.screen_and_fuse(
+            proteins=proteins,
+            paths=paths,
+            batch_size=batch_size,
+            enable_stage2a=enable_stage2a,
+            enable_stage2b=enable_stage2b,
+        )
+    except (ProteinScreeningError, HomologyAdapterError, HomologyContractError) as error:
+        console.print(f"[red]Research screening failed: {error}[/red]")
+        raise typer.Exit(code=1)
+    console.print(
+        f"[green]Wrote {len(records)} fully fused research predictions to {output_path}[/green]"
+    )
+
+
 @app.command()
 def scan(
     fasta_path: Path = typer.Option(..., "--fasta", "-f", help="Path to input FASTA file (complete genome or metagenome contigs)"),
@@ -730,6 +874,12 @@ def scan(
     min_contig_len: int = typer.Option(500, "--min-contig-len", help="Minimum contig length filter in metagenome mode"),
     min_bitscore: float = typer.Option(10.6, "--min-bitscore", help="Bitscore threshold for transposase filtering"),
     batch_size: int = typer.Option(1000, "--batch-size", help="Batch size of contigs for streaming processing"),
+    research: bool = typer.Option(False, "--research/--no-research", help="Enable closed-loop Stage 2 structure validation & novelty discovery on detected transposases"),
+    reference_fasta: Optional[Path] = typer.Option(None, "--reference-fasta", help="Reference protein FASTA for research validation"),
+    hmm_database: Optional[Path] = typer.Option(None, "--hmm-database", help="Pressed HMM database for research validation"),
+    research_profile: str = typer.Option("fast", "--research-profile", help="Research screening profile: 'fast' (ESM2-8M) or 'standard' (ESM2-35M)"),
+    enable_stage2a: bool = typer.Option(True, "--enable-stage2a/--disable-stage2a", help="Enable ProstT5 fast 3Di structure rescue in research validation"),
+    enable_stage2b: bool = typer.Option(True, "--enable-stage2b/--disable-stage2b", help="Enable explicit 3D modeling and SaProt in research validation"),
 ):
     """Universal DeepISE scanner for complete bacterial genomes, draft assemblies, and metagenomes."""
     from Bio import SeqIO
@@ -770,6 +920,30 @@ def scan(
         console.print(f"Detected [bold green]{len(elements)}[/bold green] IS elements.")
         console.print(f"Exported results to [green]{gff_p}[/green], [green]{tsv_p}[/green], [green]{fna_p}[/green]")
 
+    if research:
+        console.print("[bold magenta]Executing closed-loop Stage 2 structure validation and novelty discovery...[/bold magenta]")
+        faa_file = output_dir / "deepise_tpases.faa"
+        tsv_file = output_dir / "deepise_is_elements.tsv"
+        json_file = output_dir / "deepise_summary.json"
+        res = perform_closed_loop_research_validation(
+            elements_tsv=tsv_file,
+            tpases_faa=faa_file,
+            output_dir=output_dir,
+            reference_fasta=reference_fasta,
+            hmm_database=hmm_database,
+            profile=research_profile,
+            enable_stage2a=enable_stage2a,
+            enable_stage2b=enable_stage2b,
+            threads=threads,
+            summary_json=json_file,
+        )
+        console.print(f"[green]Research validation completed on {res.total_tpases_evaluated} transposases:[/green]")
+        console.print(f"  - High Confidence Novel IS: [bold cyan]{res.high_confidence_novel_count}[/bold cyan]")
+        console.print(f"  - High Confidence Known IS: [bold green]{res.high_confidence_known_count}[/bold green]")
+        console.print(f"  - Candidate Novel IS:       [yellow]{res.candidate_novel_count}[/yellow]")
+        console.print(f"  - Research Predictions:     [green]{res.research_predictions_path.name}[/green]")
+        console.print(f"  - Novel Discoveries:        [bold green]{res.novel_discoveries_path.name}[/bold green]")
+
 
 @app.command()
 def scan_metagenome(
@@ -780,6 +954,12 @@ def scan_metagenome(
     min_contig_len: int = typer.Option(500, "--min-contig-len", help="Minimum contig length filter"),
     min_bitscore: float = typer.Option(10.6, "--min-bitscore", help="Bitscore threshold for transposases"),
     batch_size: int = typer.Option(1000, "--batch-size", help="Batch size of contigs for streaming processing"),
+    research: bool = typer.Option(False, "--research/--no-research", help="Enable closed-loop Stage 2 structure validation & novelty discovery on detected transposases"),
+    reference_fasta: Optional[Path] = typer.Option(None, "--reference-fasta", help="Reference protein FASTA for research validation"),
+    hmm_database: Optional[Path] = typer.Option(None, "--hmm-database", help="Pressed HMM database for research validation"),
+    research_profile: str = typer.Option("fast", "--research-profile", help="Research screening profile: 'fast' (ESM2-8M) or 'standard' (ESM2-35M)"),
+    enable_stage2a: bool = typer.Option(True, "--enable-stage2a/--disable-stage2a", help="Enable ProstT5 fast 3Di structure rescue in research validation"),
+    enable_stage2b: bool = typer.Option(True, "--enable-stage2b/--disable-stage2b", help="Enable explicit 3D modeling and SaProt in research validation"),
 ):
     """Scan fragmented metagenomes or multi-contig MAGs with edge-truncation classification."""
     console.print(f"[bold cyan]Scanning metagenome contigs from {fasta_path} using mode={mode.upper()}...[/bold cyan]")
@@ -793,6 +973,27 @@ def scan_metagenome(
     gff_p, tsv_p, fna_p, faa_p, json_p = export_metagenome_results(elements, stats, output_dir)
     console.print(f"Detected [bold green]{len(elements)}[/bold green] IS elements in {stats['runtime_seconds']}s ({stats['throughput_mbp_per_sec']} Mbp/s).")
     console.print(f"Outputs written to [green]{output_dir}[/green]: GFF3, TSV, FNA, FAA, JSON.")
+
+    if research:
+        console.print("[bold magenta]Executing closed-loop Stage 2 structure validation and novelty discovery...[/bold magenta]")
+        res = perform_closed_loop_research_validation(
+            elements_tsv=tsv_p,
+            tpases_faa=faa_p,
+            output_dir=output_dir,
+            reference_fasta=reference_fasta,
+            hmm_database=hmm_database,
+            profile=research_profile,
+            enable_stage2a=enable_stage2a,
+            enable_stage2b=enable_stage2b,
+            threads=threads,
+            summary_json=json_p,
+        )
+        console.print(f"[green]Research validation completed on {res.total_tpases_evaluated} transposases:[/green]")
+        console.print(f"  - High Confidence Novel IS: [bold cyan]{res.high_confidence_novel_count}[/bold cyan]")
+        console.print(f"  - High Confidence Known IS: [bold green]{res.high_confidence_known_count}[/bold green]")
+        console.print(f"  - Candidate Novel IS:       [yellow]{res.candidate_novel_count}[/yellow]")
+        console.print(f"  - Research Predictions:     [green]{res.research_predictions_path.name}[/green]")
+        console.print(f"  - Novel Discoveries:        [bold green]{res.novel_discoveries_path.name}[/bold green]")
 
 
 @app.command()

@@ -1,0 +1,29 @@
+Method	Stratum	Total_Positives	Detected_Positives	Recall
+MMseqs2 Alone	<20% (Twilight Zone)	71	0	0.0
+MMseqs2 Alone	20-30% (Remote Homology)	221	221	1.0
+MMseqs2 Alone	30-50% (Medium Identity)	751	750	0.9987
+MMseqs2 Alone	>=50% (Close Homologs)	20	20	1.0
+HMMER Alone	<20% (Twilight Zone)	71	39	0.5493
+HMMER Alone	20-30% (Remote Homology)	221	220	0.9955
+HMMER Alone	30-50% (Medium Identity)	751	751	1.0
+HMMER Alone	>=50% (Close Homologs)	20	20	1.0
+Combined Homology	<20% (Twilight Zone)	71	39	0.5493
+Combined Homology	20-30% (Remote Homology)	221	221	1.0
+Combined Homology	30-50% (Medium Identity)	751	751	1.0
+Combined Homology	>=50% (Close Homologs)	20	20	1.0
+ESM-2 (8M) Alone	<20% (Twilight Zone)	71	43	0.6056
+ESM-2 (8M) Alone	20-30% (Remote Homology)	221	215	0.9729
+ESM-2 (8M) Alone	30-50% (Medium Identity)	751	750	0.9987
+ESM-2 (8M) Alone	>=50% (Close Homologs)	20	14	0.7
+ESM-2 (35M) Alone	<20% (Twilight Zone)	71	59	0.831
+ESM-2 (35M) Alone	20-30% (Remote Homology)	221	220	0.9955
+ESM-2 (35M) Alone	30-50% (Medium Identity)	751	751	1.0
+ESM-2 (35M) Alone	>=50% (Close Homologs)	20	20	1.0
+ESM-2 + ProstT5 (Stage 2A)	<20% (Twilight Zone)	71	60	0.8451
+ESM-2 + ProstT5 (Stage 2A)	20-30% (Remote Homology)	221	221	1.0
+ESM-2 + ProstT5 (Stage 2A)	30-50% (Medium Identity)	751	751	1.0
+ESM-2 + ProstT5 (Stage 2A)	>=50% (Close Homologs)	20	20	1.0
+DeepISE Full Fusion (Stage 1+2A+2B)	<20% (Twilight Zone)	71	60	0.8451
+DeepISE Full Fusion (Stage 1+2A+2B)	20-30% (Remote Homology)	221	221	1.0
+DeepISE Full Fusion (Stage 1+2A+2B)	30-50% (Medium Identity)	751	751	1.0
+DeepISE Full Fusion (Stage 1+2A+2B)	>=50% (Close Homologs)	20	20	1.0

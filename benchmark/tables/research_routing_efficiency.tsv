@@ -1,0 +1,2 @@
+Split	Total_Sequences	Stage1_Early_Accept	Stage1_Early_Reject	Stage1_Early_Exit_Rate_Pct	Stage2A_Candidates	Stage2B_Candidates	Compute_Reduction_Pct
+Test (cluster30)	4252	1010	3210	99.25	32	32	99.25

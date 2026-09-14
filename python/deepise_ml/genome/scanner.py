@@ -40,6 +40,7 @@ class DetectedISElement(BaseModel):
     tsd_length: Optional[int] = None
     tsd_sequence: Optional[str] = None
     structural_evidence: Optional[str] = None
+    protein_sequence: Optional[str] = None
     notes: str = ""
 
 
@@ -139,6 +140,7 @@ class DeepISEGenomeScanner:
                         "family": fam,
                         "score": sc,
                         "evalue": ev,
+                        "translation": g.translate(),
                     })
 
             # Group overlapping / tightly linked ORFs (< 250 bp apart and same family)
@@ -160,9 +162,11 @@ class DeepISEGenomeScanner:
                 c_end = cluster[-1]["end"]
                 c_strand = cluster[0]["strand"]
                 c_fam = cluster[0]["family"]
-                best_tp_score = max(c["score"] for c in cluster)
+                primary_gene = max(cluster, key=lambda c: c["score"])
+                best_tp_score = primary_gene["score"]
                 min_tp_evalue = min(c["evalue"] for c in cluster)
-                primary_gene_id = cluster[0]["gene_id"]
+                primary_gene_id = primary_gene["gene_id"]
+                tpase_seq = primary_gene.get("translation")
 
                 # Boundary prediction
                 if mode in ["hybrid", "plan_a_hybrid"]:
@@ -225,6 +229,7 @@ class DeepISEGenomeScanner:
                     tsd_length=tsd_len,
                     tsd_sequence=tsd_seq,
                     structural_evidence=struct_ev,
+                    protein_sequence=tpase_seq,
                     notes=comp_res.notes,
                 )
                 all_detected.append(elem)
@@ -294,5 +299,18 @@ def export_genome_results(
         for i in range(0, len(elem_dna), 80):
             fna_lines.append(elem_dna[i : i + 80])
     fna_path.write_text("\n".join(fna_lines) + "\n")
+
+    # 4. FAA (Transposase protein)
+    faa_path = out_dir / "deepise_tpases.faa"
+    faa_lines = []
+    for e in elements:
+        if e.protein_sequence:
+            header = f">{e.element_id}_tpase gene={e.tpase_gene_id} contig={e.contig_id} family={e.family} score={e.tpase_score:.1f}"
+            faa_lines.append(header)
+            seq = e.protein_sequence
+            for i in range(0, len(seq), 80):
+                faa_lines.append(seq[i : i + 80])
+    if faa_lines:
+        faa_path.write_text("\n".join(faa_lines) + "\n")
 
     return gff_path, tsv_path, fna_path

@@ -24,7 +24,9 @@ dependencies = [
     "pyyaml",
     "typer>=0.9.0",
     "rich",
-    "tqdm"
+    "tqdm",
+    "pyrodigal>=3.7",
+    "transformers>=5.0"
 ]
 
 [project.scripts]

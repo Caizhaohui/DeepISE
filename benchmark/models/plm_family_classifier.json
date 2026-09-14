@@ -1,0 +1,11 @@
+{
+  "artifact_version": 1,
+  "classifier": "deepise_ml.models.plm_family.PLMFamilyClassifier",
+  "model_key": "esm2_35m",
+  "embedding_dimension": 480,
+  "pooling": "mean",
+  "dataset_split": "cluster30",
+  "calibration_split": "none",
+  "decision_threshold": 0.5,
+  "random_seed": 42
+}

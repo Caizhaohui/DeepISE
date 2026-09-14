@@ -1,0 +1,13 @@
+{
+  "artifact_version": 1,
+  "classifier": "sklearn.linear_model.LogisticRegression",
+  "model_key": "esm2_8m",
+  "embedding_dimension": 320,
+  "pooling": "mean",
+  "dataset_split": "cluster30",
+  "calibration_split": "validation",
+  "target_fdr": 0.05,
+  "achieved_fdr": 0.03952205882352941,
+  "validation_recall": 0.9803001876172608,
+  "random_seed": 42
+}
