@@ -26,6 +26,7 @@ data/genomes/
 data/metagenomes/*.fna
 data/cohorts/
 data/cache/
+data/processed/audit/
 results/
 .omo/
 

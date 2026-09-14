@@ -1,4 +1,4 @@
-# DeepISE: Deep Learning-Coupled Discovery and Nucleotide-Resolution Boundary Refinement for Bacterial Insertion Sequences
+# DeepISE: Deep Learning-Coupled Discovery and Neural Boundary Refinement for Bacterial Insertion Sequences
 
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![PyTorch 2.5](https://img.shields.io/badge/PyTorch-2.5-EE4C2C.svg?logo=pytorch&logoColor=white)](https://pytorch.org/)
@@ -6,7 +6,7 @@
 [![Tests: 84 Passed](https://img.shields.io/badge/Tests-84%20Passed-brightgreen.svg)]()
 [![Platform: Linux](https://img.shields.io/badge/Platform-Linux%20%7C%20HPC-lightgrey.svg)]()
 
-**DeepISE** is an end-to-end, high-throughput computational platform for the de novo identification, structural annotation, and sub-nucleotide boundary resolution of bacterial insertion sequences (IS elements). Designed for both pristine complete chromosomes and highly fragmented metagenome-assembled genomes (MAGs), DeepISE overcomes the longstanding limitations of classical alignment-based tools through a hybrid paradigm coupling **Protein Language Models (PLMs)**, **family-adaptive biological heuristics**, **1D Dilated Residual CNNs**, and **assembly-break edge truncation classification**.
+**DeepISE** is an experimental multimodal framework for remote bacterial insertion-sequence discovery using protein language models, sequence homology, structural evidence, and genomic context. Designed for both complete chromosomes and draft metagenome-assembled genomes (MAGs), DeepISE investigates whether transformer representations (ESM-2) break the evolutionary "twilight zone" of transposase detection while refining physical insertion boundaries via family-adaptive biological heuristics and 1D dilated convolutional models.
 
 ---
 
@@ -15,23 +15,23 @@
 1. **Remote Transposase Homology Mining (<20% Sequence Identity)**
    - Classical alignment tools (BLASTP, MMseqs2) and Profile HMMs suffer severe sensitivity drop-offs in the evolutionary "twilight zone". DeepISE harnesses **ESM-2 representations** to achieve an **AUPRC of 0.9960** and **83.10% recall** on remote homologs (<20% identity), outperforming Profile HMMs by **+28.17%** and BLASTP by **+47.89%**.
 2. **First-Class Support for Non-Canonical Transposition Mechanisms**
-   - Traditional IS mining tools (e.g. ISEScan, digIS) strictly assume Terminal Inverted Repeats (TIRs), completely failing on non-canonical families. DeepISE integrates dedicated biological modules for:
+   - Classical IS callers predominantly rely on transposase homology and family-specific terminal-sequence heuristics (such as strictly assuming Terminal Inverted Repeats [TIRs]), which can lose sensitivity for highly divergent or mechanistically atypical elements. DeepISE investigates dedicated biological modules for:
      - **IS200/IS605**: HUH transposases, stem-loop hairpin secondary structures, and TnpB endonucleases (ancestors of Cas12).
      - **IS91**: Rolling-circle replication, conserved *ter_IS* (5'-CCAC-3') and *ori_IS* motifs without terminal repeats.
-     - **IS110**: Serine/tyrosine recombinases, subterminal core motifs, and Bridge RNA-guided DNA recombination systems.
+     - **IS110**: IS110-family RNA-guided recombinases (RuvC-like DEDD recombinases), subterminal core motifs, and Bridge RNA-guided DNA recombination systems.
 3. **Hybrid Physics $\times$ Neural Boundary Refiner (1D Dilated Residual CNN)**
    - Resolves degenerate or blurred terminal boundaries using a 1D Dilated Residual Convolutional Neural Network (receptive field 64 bp, dilations 1, 2, 4) trained on 13,864 genomic junction windows.
    - Slashes mean boundary absolute error (MAE) from 392.1 bp down to **168.9 bp (-56.9% error reduction)**.
 4. **Metagenomic Edge-Truncation Engine**
    - Transposons frequently cause assembly breaks in de Bruijn graph assemblers (metaSPAdes, MEGAHIT). DeepISE features a dedicated streaming engine that categorizes elements into `complete`, `edge_5p_truncated`, `edge_3p_truncated`, `edge_both_truncated`, or `internal_partial` with **91.00% classification accuracy**.
-5. **58.5$\times$ Faster Than Classical Tools**
-   - Completes full-genome scanning of *Escherichia coli* (4.64 Mb) in **7.38 seconds** compared to **432.00 seconds** for ISEScan (58.5$\times$ speedup) at identical 86.00% sensitivity.
+5. **High-Throughput Genome Scanning**
+   - On the tested *E. coli* benchmark configuration (4.64 Mb), DeepISE completed the end-to-end ORF extraction, transposase screening, and boundary resolution in **7.38 seconds** compared to **432.00 seconds** for ISEScan. Standardized cross-tool benchmarking across diverse genomes and hardware configurations is ongoing.
 6. **Structure-Aware Rescue & Multi-Modal Protein Validation (Stage 2A & 2B)**
    - Overcomes the extreme "twilight zone" (<20% sequence identity) by coupling bilingual sequence-to-structure translation (**ProstT5 3Di**) with explicit 3D structural alignment (**Foldseek**) and structure-aware protein language modeling (**SaProt** dual-modality `AA#3Di`).
    - Hierarchical candidate routing resolves **99.25% of sequences immediately at Stage 1**, reducing expensive structural computation by **99.25%** while boosting extreme remote homolog recall to **84.51%~92.96%**.
 7. **Closed-Loop Genome-Protein Bidirectional Validation**
    - Bridges genomic DNA physical boundary mechanics (TIRs, TSDs, hairpins) with protein-level structural novelty (`deepise scan --research`).
-   - Categorizes mobile elements into a rigorous 5-tier taxonomy (`High_Confidence_Novel_IS`, `High_Confidence_Known_IS`, `Candidate_Novel_IS`, etc.), enabling high-precision discovery of novel mobile elements and emerging natural gene editing systems (Bridge RNA IS110 and TnpB IS200).
+   - Categorizes mobile elements into a rigorous 5-tier putative taxonomy (`High_Confidence_Putative_Novel_IS`, `High_Confidence_Known_IS`, `Candidate_Putative_Novel_IS`, etc.), enabling high-precision prioritization of novel mobile elements and emerging natural gene editing systems (Bridge RNA IS110 and TnpB IS200).
 
 ---
 
@@ -104,12 +104,34 @@ flowchart TD
     subgraph ClosedLoop["Closed-Loop Dual-Validation (deepise scan --research)"]
         DNA_ELEM["Genomic IS Boundary (TIR / TSD / Hairpin)"] --> DUAL{"Dual-Layer Cross-Validation"}
         FUSION --> DUAL
-        DUAL --> NOVEL["High_Confidence_Novel_IS (Complete Boundary + Novel Structure)"]
+        DUAL --> NOVEL["High_Confidence_Putative_Novel_IS (Complete Boundary + Novel Structure)"]
         DUAL --> KNOWN["High_Confidence_Known_IS (Complete Boundary + Known Tpase)"]
-        DUAL --> CAND["Candidate_Novel_IS (Broken Boundary + Novel Tpase)"]
+        DUAL --> CAND["Candidate_Putative_Novel_IS (Broken Boundary + Novel Tpase)"]
         DUAL --> STD["Confirmed_Standard_IS / Standard_IS"]
     end
 ```
+
+---
+
+## 🚦 Module Validation Status
+
+To adhere strictly to scientific transparency, DeepISE explicitly differentiates between empirically validated methodologies, experimental research branches, and early exploratory prototypes:
+
+| Module / Component | Status | Validation Scope & Status |
+| :--- | :---: | :--- |
+| **ISfinder Dataset Pipeline** | ✅ **Validated** | Curated deduplication, CD-HIT / MMseqs2 clustering, family mapping. |
+| **Homology-Disjoint 30% Split** | ✅ **Validated** | Reciprocal coverage $\ge 80\%$ audited: **0.00% exact leakage**, **93.79% strict Remote-30**. |
+| **ESM-2 Remote Tpase Detection** | ✅ **Validated** | Tested on strict Remote-20 (**97.00% recall**) and Leave-One-Family-Out (**97.20% macro recall**). |
+| **Mechanistic Hard-Negative Control** | ✅ **Validated** | Near-zero false positives across nucleases (**1.17% FPR**), helicases (**0.00%**), and RuvC/RNase H (**0.00%**). |
+| **Baseline Homology (HMM / MMseqs2)** | ✅ **Validated** | Reproducible baselines evaluated across identical disjoint splits. |
+| **Genomic Boundary Engine (Plan A/B)** | 🟡 **Experimental** | Family-adaptive TIR/TSD/hairpin heuristics; requires element-level truth benchmark. |
+| **1D CNN Boundary Refinement** | 🟡 **Experimental** | Trained on 13,864 junction windows (MAE 168.9 bp); requires independent experimental truth set. |
+| **Foldseek Structural Alignment** | 🟡 **Experimental** | Fast structural scoring against AlphaFold/PDB IS database; benchmark integration ongoing. |
+| **ProstT5 3Di Alphabet Rescue** | 🟡 **Experimental** | Zero-shot sequence-to-structure translation for twilight candidates. |
+| **SaProt Dual-Modality Model** | 🟡 **Experimental** | Interleaved `AA#3Di` structural representation and scoring. |
+| **IS110 Boundary Heuristics** | 🧪 **Prototype** | Subterminal core motif search & fixed-window fallback; bRNA architecture modeling planned. |
+| **Metagenomic Edge Truncation** | 🧪 **Prototype** | Evaluated on synthetic assembly breaks (91.00% accuracy); pending real complex MAG truth set. |
+| **Novel IS Taxonomic Classification** | 🧪 **Prototype** | Putative prioritization labels pending wet-lab or long-read biochemical validation. |
 
 ---
 
@@ -144,7 +166,7 @@ DeepISE establishes a new paradigm in mobile genetic element mining by bridging 
 Transposases and recombinases represent the most ubiquitous, evolutionarily plastic genes in the prokaryotic kingdom. Under relentless evolutionary pressure from host defense systems (e.g. restriction-modification, CRISPR-Cas, and epigenetic defense), transposases mutate at hyper-accelerated rates. Consequently, sequence identity between distant homologs frequently falls below 20%—the infamous evolutionary **"twilight zone"**:
 - **Classical Sequence Alignment Collapse**: In this regime, pairwise local alignment tools such as BLASTP and MMseqs2 collapse entirely. On strictly audited, leak-free benchmark clusters derived from ISfinder, MMseqs2 achieves **0.00% recall** at $<20\%$ identity, while BLASTP recovers only **35.21%**.
 - **Profile HMM Limitations**: Profile HMMs construct linear position-specific scoring matrices (PSSMs). While more sensitive than local alignment, they capture only linear residue preferences and fail to model higher-order co-evolutionary dependencies, reaching only **54.93% recall** in the twilight zone.
-- **Structural Invariance**: In sharp contrast to primary sequence drift, the 3D catalytic core topology (e.g. the RNase H-like fold of canonical DDE/D transposases, the HUH fold of IS200/IS605, or the catalytic fold of serine/tyrosine recombinases) remains strictly conserved across billions of years of evolution. DeepISE harnesses transformer-based **Protein Language Models (ESMs)** and **3Di structural tokens** to capture these evolutionary invariants directly.
+- **Structural Invariance**: In sharp contrast to primary sequence drift, the 3D catalytic core topology (e.g. the RNase H-like fold of canonical DDE/D transposases, the HUH fold of IS200/IS605, or the catalytic fold of tyrosine/serine and DEDD/RuvC-like recombinases) remains strictly conserved across billions of years of evolution. DeepISE harnesses transformer-based **Protein Language Models (ESMs)** and **3Di structural tokens** to capture these evolutionary invariants directly.
 
 ### 2. Staged Hierarchical Routing Architecture (99.25% Compute Cost Reduction)
 Applying full-atom 3D structure prediction (e.g., AlphaFold2 or ESMFold) or complex structural alignments across hundreds of thousands of candidate open reading frames is computationally prohibitive for large-scale genomics. DeepISE solves this computational bottleneck via a tiered, deterministic routing architecture:
@@ -186,16 +208,16 @@ DeepISE integrates these two orthogonal layers through a **Closed-Loop Bidirecti
 1. **Genomic Level**: Analyzes nucleotide-level boundaries (Terminal Inverted Repeats, Target Site Duplications, stem-loop hairpins, and contig edge truncation status).
 2. **Protein Level**: Extracts the embedded transposase ORFs (`deepise_tpases.faa`) and passes them through the Stage 2 research screening pipeline.
 3. **Cross-Validation Integration**: Outputs `deepise_novel_discoveries.tsv` with a 5-tier classification:
-   - **`High_Confidence_Novel_IS`**: Intact genomic boundary (valid TIR+TSD or stem-loop) $\mathbf{+}$ Novel/Remote transposase structure. Highest priority for experimental isolation and downstream characterization.
+   - **`High_Confidence_Putative_Novel_IS`**: Intact genomic boundary (valid TIR+TSD or stem-loop) $\mathbf{+}$ Novel/Remote transposase structure. High priority for experimental isolation and downstream characterization.
    - **`High_Confidence_Known_IS`**: Intact genomic boundary $\mathbf{+}$ Confirmed known transposase.
-   - **`Candidate_Novel_IS`**: Metagenomic assembly break (edge-truncated) $\mathbf{+}$ Novel transposase structure.
+   - **`Candidate_Putative_Novel_IS`**: Metagenomic assembly break (edge-truncated) $\mathbf{+}$ Novel transposase structure.
    - **`Confirmed_Standard_IS`**: Intact genomic boundary $\mathbf{+}$ Standard transposase call.
    - **`Standard_IS`**: Baseline elements.
 
 ### 7. Discovery of Emerging Natural Gene Editing Systems
 DeepISE's structural and non-canonical modules are specifically tailored to accelerate the discovery of next-generation biotechnological tools:
 - **IS110 Family & Programmable Bridge RNA Recombinases**:
-  - IS110 elements encode serine/tyrosine recombinases that operate via non-coding Bridge RNAs. The Bridge RNA contains independent target-binding and donor-binding loops that specify target and donor DNA sequences.
+  - IS110 elements encode RNA-guided recombinases (RuvC-like DEDD recombinases) that operate via non-coding Bridge RNAs. The Bridge RNA contains independent target-binding and donor-binding loops that specify target and donor DNA sequences.
   - Unlike CRISPR-Cas systems that introduce double-strand DNA breaks (DSBs), Bridge RNA-guided recombinases catalyze clean, scarless DNA recombination, inversion, and large-cargo insertion without host-mediated DNA repair.
   - DeepISE identifies subterminal core motifs and uncharacterized recombinase architectures across diverse phyla.
 - **IS200/IS605 Family & Hyper-Compact TnpB Endonucleases**:
@@ -281,7 +303,7 @@ deepise scan -f input_assembly.fasta -o results/scan_output --research --researc
 When `--research` is active:
 - Transposases from detected elements (`deepise_tpases.faa`) are routed through ProstT5 (3Di rescue) and SaProt structural modeling.
 - Outputs `deepise_tpases_research.tsv` (42 columns) and `deepise_novel_discoveries.tsv`.
-- Elements with complete boundaries (valid TIR+TSD) and novel transposase structures are promoted to **`High_Confidence_Novel_IS`**.
+- Elements with complete boundaries (valid TIR+TSD) and novel transposase structures are promoted to **`High_Confidence_Putative_Novel_IS`**.
 
 ### 4. Protein-Level Stage-1 Screening
 Use `screen-proteins` for protein FASTA inputs. This command is independent of genome boundary calling, so `scan --mode hybrid|plan_a|plan_b` remains unchanged.
@@ -366,10 +388,64 @@ DeepISE generates five production-ready artifacts in the designated output direc
 
 ---
 
-## 🔬 Benchmark Results
+## 🔬 Benchmark Results & Scientific Audit
 
-### 1. Remote Transposase Homology (<20% Sequence Identity)
-Evaluated on a strictly audited, zero-leakage test set derived from 301 disjoint MMseqs2 30% identity clusters:
+### 1. Rigorous Homology Decomposition & Zero-Leakage Audit (Scientific Audit v1)
+To address the "twilight zone" of transposase evolution without methodological bias, DeepISE audited all 1,063 positive test proteins against all 6,104 positive training proteins using reciprocal alignment coverage ($\text{reciprocal\_coverage} = \min(\text{qcov}, \text{tcov})$) in addition to local sequence identity:
+
+| Homology Strata | Definition | Test Positives | Proportion | Evaluation Status |
+| :--- | :--- | :---: | :---: | :--- |
+| **L1 Exact Sequence Leakage** | 100% identity | 0 / 1,063 | **0.00%** | Strict Pass (Zero leakage) |
+| **L2 Close Full-Length Homology** | $\ge 30\%$ identity at $\ge 80\%$ reciprocal coverage | 66 / 1,063 | 6.21% | Isolated from remote metrics |
+| **L3 Domain-Only Overlap** | $\ge 30\%$ local identity but $<80\%$ reciprocal coverage | 130 / 1,063 | 12.23% | Shared catalytic motifs (e.g. DDE/D) |
+| **Strict Remote-30 Homology** | $<30\%$ identity at $\ge 80\%$ reciprocal coverage | 997 / 1,063 | **93.79%** | True full-length remote homologs |
+| **Strict Remote-20 (Twilight Zone)** | $<20\%$ identity at $\ge 80\%$ reciprocal coverage | 434 / 1,063 | **40.83%** | Distant evolutionary divergence |
+| **No Full-Length Homolog** | No training match at $\ge 80\%$ reciprocal coverage | 428 / 1,063 | **40.26%** | Structural/orphan transposases |
+
+*Finding: Short local alignments (e.g. a 63 aa hit to a 500 aa protein) previously caused domain matches to be misclassified as "high identity". Enforcing reciprocal coverage $\ge 80\%$ proves that **93.79% of test positives are bona fide remote homologs**.*
+
+---
+
+### 2. Leave-One-Family-Out (LOFO) Generalization Benchmark
+To determine whether transformer representations generalize across unseen insertion sequence architectures, DeepISE evaluated whole-protein Profile-HMMs versus frozen ESM-2 representations across the 12 most abundant IS families under a strict leave-one-family-out protocol:
+
+| Held-Out IS Family | Test Sequences | Profile-HMM Recall | ESM2-LR Recall | ESM2 Advantage |
+| :--- | :---: | :---: | :---: | :---: |
+| **IS3** | 244 | 0.82% (2/244) | **95.90%** (234/244) | **+95.08 pp** |
+| **IS5** | 126 | 60.32% (76/126) | **97.62%** (123/126) | **+37.30 pp** |
+| **IS1595** | 84 | 3.57% (3/84) | **98.81%** (83/84) | **+95.24 pp** |
+| **IS630** | 78 | 79.49% (62/78) | **97.44%** (76/78) | **+17.95 pp** |
+| **IS110** | 72 | 77.78% (56/72) | **94.44%** (68/72) | **+16.67 pp** |
+| **IS4** | 66 | 34.85% (23/66) | **98.48%** (65/66) | **+63.64 pp** |
+| **IS256** | 58 | 8.62% (5/58) | **100.00%** (58/58) | **+91.38 pp** |
+| **IS66** | 45 | 8.89% (4/45) | **97.78%** (44/45) | **+88.89 pp** |
+| **IS21** | 44 | 38.64% (17/44) | **97.73%** (43/44) | **+59.09 pp** |
+| **IS1182** | 43 | 55.81% (24/43) | **97.67%** (42/43) | **+41.86 pp** |
+| **IS1** | 42 | 2.38% (1/42) | **95.24%** (40/42) | **+92.86 pp** |
+| **IS1380** | 37 | 56.76% (21/37) | **97.30%** (36/37) | **+40.54 pp** |
+| **Macro Average** | **909** | **35.51%** | **97.20%** | **+61.69 pp gain** |
+
+*Finding: When an entire IS family is held out from training, Profile-HMMs suffer catastrophic sensitivity loss (dropping to 0.82% on IS3, 2.38% on IS1, 3.57% on IS1595, and 8.62% on IS256). In contrast, ESM-2 maintains **97.20% macro recall**, proving genuine cross-family structural and functional generalization.*
+
+---
+
+### 3. Mechanistic Hard-Negative Stress Test (False Positive Control)
+Transposases share catalytic domains (e.g. RNase H-like DDE motifs, HUH motifs, or recombinase active sites) with essential cellular enzymes. DeepISE evaluated False Positive Rates (FPR) across challenging non-transposase enzyme classes:
+
+| Negative Enzyme Class | Tested Sequences | ESM2-LR FPR | ESM2-MLP FPR | Baseline HMM FPR |
+| :--- | :---: | :---: | :---: | :---: |
+| **RuvC-like & RNase H Nucleases** | 217 | **0.00%** (0/217) | **0.00%** (0/217) | 0.00% |
+| **Helicases & Motor Proteins** | 227 | **0.00%** (0/227) | **0.00%** (0/227) | 0.00% |
+| **DNA Repair Enzymes** | 89 | **0.00%** (0/89) | **1.12%** (1/89) | 0.00% |
+| **Cellular Nucleases Overall** | 1,199 | **1.33%** (16/1199) | **1.17%** (14/1199) | 0.42% |
+| **Site-Specific Recombinases** | 63 | 6.35% (4/63) | **0.00%** (0/63) | 1.59% |
+
+*Finding: DeepISE does not mistake cellular nucleases, RNase H homologs, or helicases for transposases, maintaining near-zero false positive rates on mechanistically related cellular machinery.*
+
+---
+
+### 4. Twilight Zone Performance (<20% Sequence Identity)
+Evaluated on the disjoint MMseqs2 30% identity test set:
 
 | Method | Overall AUPRC | Recall @ 5% FDR | Remote Recall (<20% Identity) |
 | :--- | :---: | :---: | :---: |
@@ -379,10 +455,11 @@ Evaluated on a strictly audited, zero-leakage test set derived from 301 disjoint
 | **DeepISE (ESM-2 + Linear)** | **0.9960** | **98.78%** | **83.10%** (+28.17% vs HMM) |
 | **DeepISE (Multi-Task PLM)** | **0.9957** | **98.50%** | **81.69%** (84.85% Top-1 Family Acc) |
 
-### 2. Phase 7 Multimodal Ablation & Structural Rescue (Stage 2A & 2B)
-Evaluated across the strictly audited, zero-leakage test split (`data/splits/cluster30/test_combined.parquet`, $n=4,252$: 1,063 Positives, 3,189 Negatives) across all sequence identity strata:
+---
 
-#### Multi-Method Ablation Comparison
+### 5. Multi-Method Ablation & Structural Rescue (Stage 2A & 2B)
+Evaluated across the full test split (`data/splits/cluster30/test_combined.parquet`, $n=4,252$: 1,063 Positives, 3,189 Negatives):
+
 | Method | AUPRC | ROC-AUC | Recall @ 5% FDR | F1 Score | MCC | Twilight Recall (<20% Id) | Remote Recall (20-30% Id) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **MMseqs2 Alone** | 0.9489 | 0.9664 | 93.23% | 0.9635 | 0.9529 | **0.00%** | 100.00% |
@@ -393,49 +470,33 @@ Evaluated across the strictly audited, zero-leakage test split (`data/splits/clu
 | **ESM-2 + ProstT5 (Stage 2A)** | **0.9968** | **0.9985** | **98.97%** | **0.9705** | **0.9607** | **84.51%** | **100.00%** |
 | **DeepISE Full Fusion (Stage 1+2A+2B)** | **0.9967** | **0.9985** | **98.97%** | **0.9705** | **0.9607** | **84.51%** | **100.00%** |
 
-#### Stratified Recall by Sequence Identity
-| Method | Twilight Zone (<20% Id, n=71) | Remote Zone (20-30% Id, n=221) | Moderate (30-50% Id, n=751) | Close ( $\ge$50% Id, n=20) |
-| :--- | :---: | :---: | :---: | :---: |
-| MMseqs2 Alone | 0.00% | 100.00% | 99.87% | 100.00% |
-| HMMER Alone | 54.93% | 99.55% | 100.00% | 100.00% |
-| Combined Homology | 54.93% | 100.00% | 100.00% | 100.00% |
-| ESM-2 (8M) Alone | 60.56% | 97.29% | 99.87% | 70.00% |
-| ESM-2 (35M) Alone | 83.10% | 99.55% | 100.00% | 100.00% |
-| ESM-2 + ProstT5 (Stage 2A) | 84.51% | 100.00% | 100.00% | 100.00% |
-| **DeepISE Full Fusion (Stage 1+2A+2B)** | **84.51%** | **100.00%** | **100.00%** | **100.00%** |
+---
 
-#### Staged Candidate Routing Efficiency & Compute Conservation
-| Metric | Measured Value | Percentage of Total Cohort |
-| :--- | :---: | :---: |
-| **Total Evaluated Candidates** | 4,252 | 100.00% |
-| **Stage 1 Early Accept (`ACCEPT_KNOWN`)** | 1,010 | 23.75% |
-| **Stage 1 Early Reject (`REJECT`)** | 3,210 | 75.49% |
-| **Total Early Exits at Stage 1** | **4,220** | **99.25%** |
-| **Stage 2A Queued (ProstT5 3Di Rescue)** | 32 | 0.75% |
-| **Stage 2B Queued (Explicit 3D / SaProt)** | 32 | 0.75% |
-| **GPU / Structure Compute Reduction** | **99.25% Saved** | — |
+### 6. Real Bacterial Genome Benchmark & Tool Comparison
+Head-to-head evaluation on *Escherichia coli* K-12 MG1655 (`NC_000913.3`, 4.64 Mb) against curated NCBI annotations:
 
-### 3. Real Bacterial Genome Benchmark & Cross-Tool Comparison
-Head-to-head comparison on *Escherichia coli* K-12 MG1655 (`NC_000913.3`, 4.64 Mb) against curated NCBI gold standards:
+| Tool | Sensitivity / Recall | False Complete on Lab Strain | Non-Canonical (IS110/IS200) Handling | Runtime (s) | Performance Observation |
+| :--- | :---: | :---: | :---: | :---: | :--- |
+| ISEScan v1.7.2.3 | 86.00% (43/50) | 2 false completes | Unsupported (0% recall) | 432.00 s | Standard baseline |
+| **DeepISE (Plan A)** | **86.00%** (43/50) | **0 false completes** | **Fully supported** | **7.38 s** | Fast heuristic boundary scan |
+| **DeepISE (Hybrid Engine)** | **86.00%** (43/50) | **0 false completes** | **Fully supported** | **9.39 s** | Physics + 1D CNN boundary refinement |
 
-| Tool | Sensitivity / Recall | False Complete on Lab Strain | Non-Canonical (IS110/IS200) Handling | Runtime (seconds) | Speedup Ratio |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| ISEScan v1.7.2.3 | 86.00% (43/50) | 2 false completes | Unsupported (0% recall) | 432.00 s | 1.0$\times$ |
-| **DeepISE (Plan A)** | **86.00%** (43/50) | **0 false completes** | **Fully supported** | **7.38 s** | **58.5$\times$ faster** |
-| **DeepISE (Hybrid Engine)** | **86.00%** (43/50) | **0 false completes** | **Fully supported** | **9.39 s** | **46.0$\times$ faster** |
+*Note: On this tested configuration, DeepISE completed ORF extraction, transposase screening, and boundary resolution faster than ISEScan. Standardized cross-tool benchmarking across diverse genomes, thread allocations, and hardware environments is ongoing.*
 
-*Extended multi-species verification: Pseudomonas aeruginosa PAO1 (66.6% GC, 6.26 Mb: 34.5s) and Bacillus subtilis 168 (43.5% GC, 4.22 Mb: 21.2s) confirmed zero false-positive completions.*
+---
 
-### 4. Neural Boundary Refinement
+### 7. Neural Boundary Refinement
 Performance of the 1D Dilated Residual CNN on 354 benchmark junction windows across 23 IS families:
 
 | Metric | Physical Adaptive Baseline | Hybrid (Physics + 1D Dilated CNN) | Absolute Improvement |
 | :--- | :---: | :---: | :---: |
 | **Mean Absolute Error (MAE)** | 392.1 bp | **168.9 bp** | **-223.2 bp (-56.9%)** |
-| **Outlier Error Suppression** | Frequent (>500 bp) | Strongly suppressed | Sub-nucleotide peak sharpening |
+| **Outlier Error Suppression** | Frequent (>500 bp) | Strongly suppressed | Neural peak sharpening |
 | **Real Genome Near-Match ($\le$30 bp)** | 30.23% | **34.88%** | **+4.65% boost** |
 
-### 5. Metagenomic Assembly Benchmark
+---
+
+### 8. Metagenomic Assembly Benchmark
 Evaluated across a 170-contig synthetic assembly (complete, 5'-truncated, 3'-truncated, double-truncated, and negative background contigs) and real clinical draft assembly (*Klebsiella pneumoniae* 04A025, 1.41 Mb, 15 contigs):
 
 | Benchmark Dataset | IS Recall | Negative Contig Specificity | Truncation Classification Accuracy | Full-Length MAE |
@@ -494,7 +555,7 @@ If you find DeepISE useful in your research, please cite:
 ```bibtex
 @software{deepise2026,
   author = {DeepISE Development Team},
-  title = {DeepISE: Deep Learning-Coupled Discovery and Nucleotide-Resolution Boundary Refinement for Bacterial Insertion Sequences},
+  title = {DeepISE: Deep Learning-Coupled Discovery and Neural Boundary Refinement for Bacterial Insertion Sequences},
   year = {2026},
   url = {https://github.com/Caizhaohui/DeepISE}
 }
