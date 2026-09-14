@@ -38,6 +38,7 @@ scripts/submit_*.sh
 scripts/aggregate_cohort_results.py
 scripts/aggregate_phase3_production.py
 scripts/extract_gene_editing_candidates.py
+scripts/extract_phase3_bridge_rna.py
 DEEPISE_INTERNAL_MIRROR_LARGE_SCALE_TESTING_PLAN.md
 CODEX_IMPLEMENTATION_PLAN.md
 DeepISE Scientific Audit & Development Correction Plan.md
