@@ -1,0 +1,6 @@
+method	status	val_threshold	val_fdr	hard_neg_fp	hard_neg_total	hard_neg_fpr	Overall_auprc	Overall_recall	Overall_precision	Overall_mcc	Overall_fpr	Remote30_auprc	Remote30_recall	Remote30_precision	Remote30_mcc	Remote30_fpr	Remote20_auprc	Remote20_recall	Remote20_precision	Remote20_mcc	Remote20_fpr	NoFullLength_auprc	NoFullLength_recall	NoFullLength_precision	NoFullLength_mcc	NoFullLength_fpr
+ESM-2 (35M) Alone	Experimental	0.049	4.99	23	196	11.73	0.9985	99.54	88.84	0.9162	4.87	0.9985	99.54	88.82	0.916	4.87	0.9983	99.51	88.12	0.9123	4.87	0.9993	100.0	40.35	0.6196	4.87
+ESM-2 + ProstT5 (Stage 2A)	Experimental	0.2682	4.99	20	196	10.2	0.9985	99.63	88.63	0.9152	4.97	0.9985	99.63	88.61	0.915	4.97	0.9983	99.61	87.9	0.9113	4.97	0.9993	100.0	39.83	0.6152	4.97
+ESM-2 + Foldseek (Stage 2B)	Experimental	14.95	0.0	0	196	0.0	0.3695	0.37	66.67	0.0339	0.07	0.3694	0.37	66.67	0.0339	0.07	0.3617	0.39	66.67	0.036	0.07	0.0385	0.0	0.0	-0.0048	0.07
+ESM-2 + SaProt (Stage 2B)	Experimental	0.3796	4.99	16	196	8.16	0.9929	99.54	90.93	0.9318	3.86	0.9929	99.54	90.91	0.9317	3.86	0.9923	99.51	90.33	0.9285	3.86	0.9495	100.0	46.0	0.665	3.86
+DeepISE Full Fusion (Stage 1+2A+2B)	Experimental	0.3881	4.99	18	196	9.18	0.9944	99.63	89.29	0.9202	4.65	0.9944	99.63	89.27	0.92	4.65	0.994	99.61	88.6	0.9164	4.65	0.9681	100.0	41.44	0.6286	4.65

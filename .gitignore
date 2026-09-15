@@ -19,6 +19,10 @@ data/splits/*/*.tsv
 data/splits/*/*.faa
 data/splits/*/leakage_tmp/
 data/processed/embeddings/
+data/processed/embeddings_v2/
+data/lofo/
+*.hmm
+*.h3*
 benchmark/tmp_*/
 benchmark/db/
 benchmark/results/*_raw.*
@@ -30,6 +34,20 @@ data/processed/audit/
 results/
 .omo/
 
+# Development plans and specs (not pushed)
+markdown/
+*plan*.md
+*Plan*.md
+*PLAN*.md
+*correction*.md
+*Correction*.md
+*Spec*.md
+*spec*.md
+*ROADMAP*.md
+*Roadmap*.md
+IMPLEMENTATION_STATUS.md
+DEEPISE_TWO_STAGE_PLM_ARCHITECTURE.md
+
 # Large-scale internal testing scripts and mirror plans
 scripts/prepare_pilot_cohort.py
 scripts/prepare_scaleup_cohort.py
@@ -40,17 +58,7 @@ scripts/aggregate_cohort_results.py
 scripts/aggregate_phase3_production.py
 scripts/extract_gene_editing_candidates.py
 scripts/extract_phase3_bridge_rna.py
-DEEPISE_INTERNAL_MIRROR_LARGE_SCALE_TESTING_PLAN.md
-CODEX_IMPLEMENTATION_PLAN.md
-DeepISE Scientific Audit & Development Correction Plan.md
 
 # Virtual environments
 .env/
 .venv/
-
-# Internal development plans and specs
-DeepISE Phase-0 - Phase-1 Implementation Spec.md
-DeepISE 方法学研究与技术开发计划.md
-IMPLEMENTATION_STATUS.md
-DEEPISE_LARGE_SCALE_VALIDATION_ROADMAP.md
-DEEPISE_TWO_STAGE_PLM_ARCHITECTURE.md

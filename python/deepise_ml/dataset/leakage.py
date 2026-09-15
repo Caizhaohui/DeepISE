@@ -1,5 +1,6 @@
 import shutil
 import subprocess
+from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Tuple
 import polars as pl
@@ -195,3 +196,184 @@ def generate_leakage_report_markdown(
 
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
+
+
+def audit_homology_v2(
+    search_tsv: Path,
+    query_ids: List[str],
+    labels: Dict[str, int] = None,
+    families: Dict[str, str] = None,
+    identity_threshold: float = 0.30,
+    coverage_threshold: float = 0.80,
+) -> Tuple[pl.DataFrame, dict]:
+    """Audit query-vs-target homology using reciprocal full-length criteria.
+
+    Strict Full-length match is defined as:
+        qcov >= coverage_threshold AND tcov >= coverage_threshold
+    
+    max_full_length_identity is the maximum identity among all full-length matches.
+    """
+    labels = labels or {}
+    families = families or {}
+
+    query_hits = defaultdict(list)
+    if search_tsv.exists() and search_tsv.stat().st_size > 0:
+        with open(search_tsv, "r", encoding="utf-8") as f:
+            for line in f:
+                parts = line.strip().split("\t")
+                if len(parts) >= 8:
+                    q, t, fid, aln, qcov, tcov, ev, bits = parts[:8]
+                    query_hits[q].append({
+                        "target": t,
+                        "fident": float(fid),
+                        "alnlen": int(aln),
+                        "qcov": float(qcov),
+                        "tcov": float(tcov),
+                        "evalue": float(ev),
+                        "bitscore": float(bits),
+                    })
+
+    rows = []
+    l1_exact_count = 0
+    l2_close_count = 0
+    l3_domain_only_count = 0
+    strict_remote_30_count = 0
+    strict_remote_20_count = 0
+    no_full_length_count = 0
+
+    for qid in query_ids:
+        hits = query_hits.get(qid, [])
+        label = labels.get(qid, None)
+        family = families.get(qid, "UNKNOWN")
+
+        if not hits:
+            rows.append({
+                "test_id": qid,
+                "label": label,
+                "family": family,
+                "max_full_length_identity": None,
+                "max_identity_train_id": None,
+                "max_identity_qcov": None,
+                "max_identity_tcov": None,
+                "max_identity_bitscore": None,
+                "max_identity_evalue": None,
+                "best_bitscore_identity": None,
+                "best_bitscore_train_id": None,
+                "best_bitscore_qcov": None,
+                "best_bitscore_tcov": None,
+                "max_local_identity": None,
+                "local_hit_train_id": None,
+                "local_qcov": None,
+                "local_tcov": None,
+                "homology_class": "NO_FULL_LENGTH_HOMOLOG",
+            })
+            no_full_length_count += 1
+            strict_remote_30_count += 1
+            strict_remote_20_count += 1
+            continue
+
+        # Local hit (maximum fident regardless of coverage)
+        best_local = max(hits, key=lambda h: (h["fident"], h["bitscore"]))
+
+        # Full length hits (reciprocal coverage >= coverage_threshold)
+        full_hits = [
+            h for h in hits
+            if h["qcov"] >= coverage_threshold and h["tcov"] >= coverage_threshold
+        ]
+
+        if full_hits:
+            best_id_hit = max(full_hits, key=lambda h: (h["fident"], h["bitscore"]))
+            best_bit_hit = max(full_hits, key=lambda h: (h["bitscore"], h["fident"]))
+
+            max_fl_id = best_id_hit["fident"]
+            max_fl_train_id = best_id_hit["target"]
+            max_fl_qcov = best_id_hit["qcov"]
+            max_fl_tcov = best_id_hit["tcov"]
+            max_fl_bits = best_id_hit["bitscore"]
+            max_fl_ev = best_id_hit["evalue"]
+
+            bb_id = best_bit_hit["fident"]
+            bb_train_id = best_bit_hit["target"]
+            bb_qcov = best_bit_hit["qcov"]
+            bb_tcov = best_bit_hit["tcov"]
+
+            if max_fl_id >= 0.999 and max_fl_qcov >= 0.999 and max_fl_tcov >= 0.999:
+                h_class = "L1_EXACT"
+                l1_exact_count += 1
+            elif max_fl_id >= identity_threshold:
+                h_class = "L2_CLOSE"
+                l2_close_count += 1
+            elif max_fl_id < 0.20:
+                h_class = "REMOTE_20_STRICT"
+                strict_remote_20_count += 1
+                strict_remote_30_count += 1
+            else:
+                h_class = "REMOTE_30_STRICT"
+                strict_remote_30_count += 1
+        else:
+            max_fl_id = None
+            max_fl_train_id = None
+            max_fl_qcov = None
+            max_fl_tcov = None
+            max_fl_bits = None
+            max_fl_ev = None
+
+            bb_id = None
+            bb_train_id = None
+            bb_qcov = None
+            bb_tcov = None
+
+            if best_local["fident"] >= identity_threshold:
+                h_class = "L3_DOMAIN_ONLY"
+                l3_domain_only_count += 1
+            else:
+                h_class = "NO_FULL_LENGTH_HOMOLOG"
+                no_full_length_count += 1
+
+            # Even with domain hit or no hit, it has no full-length homolog >= 30%
+            strict_remote_30_count += 1
+            strict_remote_20_count += 1
+
+        rows.append({
+            "test_id": qid,
+            "label": label,
+            "family": family,
+            "max_full_length_identity": max_fl_id,
+            "max_identity_train_id": max_fl_train_id,
+            "max_identity_qcov": max_fl_qcov,
+            "max_identity_tcov": max_fl_tcov,
+            "max_identity_bitscore": max_fl_bits,
+            "max_identity_evalue": max_fl_ev,
+            "best_bitscore_identity": bb_id,
+            "best_bitscore_train_id": bb_train_id,
+            "best_bitscore_qcov": bb_qcov,
+            "best_bitscore_tcov": bb_tcov,
+            "max_local_identity": best_local["fident"],
+            "local_hit_train_id": best_local["target"],
+            "local_qcov": best_local["qcov"],
+            "local_tcov": best_local["tcov"],
+            "homology_class": h_class,
+        })
+
+    homology_df = pl.DataFrame(rows)
+    total_q = len(query_ids)
+
+    summary = {
+        "total_queries": total_q,
+        "l1_exact_count": l1_exact_count,
+        "l1_exact_pct": (l1_exact_count / total_q * 100) if total_q > 0 else 0.0,
+        "l2_close_count": l2_close_count,
+        "l2_close_pct": (l2_close_count / total_q * 100) if total_q > 0 else 0.0,
+        "l3_domain_only_count": l3_domain_only_count,
+        "l3_domain_only_pct": (l3_domain_only_count / total_q * 100) if total_q > 0 else 0.0,
+        "strict_remote_30_count": strict_remote_30_count,
+        "strict_remote_30_pct": (strict_remote_30_count / total_q * 100) if total_q > 0 else 0.0,
+        "strict_remote_20_count": strict_remote_20_count,
+        "strict_remote_20_pct": (strict_remote_20_count / total_q * 100) if total_q > 0 else 0.0,
+        "no_full_length_count": no_full_length_count,
+        "no_full_length_pct": (no_full_length_count / total_q * 100) if total_q > 0 else 0.0,
+        "pass_strict_split": (l1_exact_count == 0 and l2_close_count == 0),
+    }
+
+    return homology_df, summary
+

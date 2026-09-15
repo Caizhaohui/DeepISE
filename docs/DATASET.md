@@ -4,6 +4,13 @@
 
 DeepISE Phase-0 constructs a strictly curated, leakage-controlled benchmark dataset for prokaryotic transposase (Tpase) and insertion sequence (IS) detection.
 
+## 1.1 Database Acquisition & Internal Mirror Priority Policy (内网镜像优先原则)
+
+> [!IMPORTANT]
+> **开发与数据获取准则（强制执行）**：
+> 凡涉及基准测试、模型训练、参考比对、结构域注释（如 Pfam/InterPro）及大规模基因组实测所需的生物学数据库资产，**必须优先使用内网高性能镜像站点 [https://mirrors.tibhpc.net/](https://mirrors.tibhpc.net/) 及其在集群上的本地分布式文件系统挂载路径 `/hpcfs/fpublic/database/`**。
+> 只有当内网镜像资源无法满足特定需求（例如特定专用数据库缺失或科学研究指定不可替代的版本）时，才允许从公网外网下载。任何外部下载资产均须记录原始 URL、下载时间与 SHA-256 校验码。
+
 ## 2. Positive Reference Source: ISfinder
 
 - **Source:** [ISfinder Database](https://isfinder.biotoul.fr/)

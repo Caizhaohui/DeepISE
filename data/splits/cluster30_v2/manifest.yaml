@@ -1,0 +1,19 @@
+counts:
+  combined:
+    test: 3883
+    total: 25652
+    train: 17873
+    validation: 3896
+  negatives:
+    test: 2795
+    total: 18595
+    train: 12994
+    validation: 2806
+  positives:
+    test: 1088
+    total: 7057
+    train: 4879
+    validation: 1090
+dataset_version: cluster30_v2
+seed: 42
+split_strategy: cluster_atomic_reciprocal_80
